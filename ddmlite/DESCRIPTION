@@ -1,0 +1,32 @@
+Package: ddmlite
+Title: Death Distribution Methods for Death Registration Completeness
+Version: 0.0.0.9000
+Authors@R:
+    person("TODO", "PLACEHOLDER", email = "todo@example.invalid",
+           role = c("aut", "cre", "cph"),
+           comment = "TODO placeholder: names, e-mail and ORCID are set by the repository owner before any release")
+Description: Estimates the completeness of death registration between two censuses with
+    death distribution methods (general growth balance, synthetic extinct
+    generations and their combination), with or without net migration, by
+    area and with paired draws, following the methods described for the
+    Global Burden of Disease (GBD) study. Development version: the shared
+    infrastructure (draws container, per-cell seeds, age groups, simulated
+    country with planted truth) is implemented; most estimation functions
+    are documented skeletons. This package is an independent implementation.
+    It is not affiliated with, endorsed by, or supported by the Institute
+    for Health Metrics and Evaluation (IHME), and it does not contain IHME
+    code or data. It is not a successor of the 'DDM' or 'DDMethods'
+    packages.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Language: en-GB
+Depends:
+    R (>= 4.0.0)
+Imports:
+    data.table,
+    stats
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Roxygen: list(markdown = TRUE)
+Config/roxygen2/version: 8.1.1

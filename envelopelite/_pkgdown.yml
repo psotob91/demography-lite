@@ -1,0 +1,25 @@
+url: ~
+template:
+  bootstrap: 5
+reference:
+- title: Envelope, life table and scaling
+  contents:
+  - starts_with('evl_')
+- title: Data contract
+  contents:
+  - 'envelopelite-contract'
+- title: Simulated data with planted truth
+  contents:
+  - simulate_country
+- title: Draws and per-cell seeds
+  contents:
+  - draws_new
+  - as_draws_long
+  - as_draws_wide
+  - draws_summarise
+  - draws_generate
+  - cell_seed
+  - with_cell_seed
+- title: Age groups
+  contents:
+  - age_groups
