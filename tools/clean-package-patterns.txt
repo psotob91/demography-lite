@@ -1,0 +1,19 @@
+# Deny-list of the clean-package control (tools/check-clean.R).
+# One rule per line: label <TAB> Perl regular expression. Lines starting with #
+# are comments. This file is the only place where these words may appear, and
+# it is excluded from the scan for that reason.
+#
+# Purpose: the packages are generic. Nothing from the national study in which
+# they were first developed (place names, institutions, data paths, internal
+# decision codes, run identifiers) may enter this repository.
+country	(?i)\bper(u|ú)(?![a-z])|(?i)\bperu(vian|an[oa]s?)\b
+institution	(?i)\b(INEI|MINSA|SINADEF|ENDES|ENAHO|ENPOVE|RENIEC|CELADE)\b
+registry-name	(?i)hechos vitales
+department	(?i)\b(Amazonas|[AÁ]ncash|Apur[ií]mac|Arequipa|Ayacucho|Cajamarca|Callao|Cu[sz]co|Huancavelica|Hu[aá]nuco|Jun[ií]n|La Libertad|Lambayeque|Loreto|Madre de Dios|Moquegua|Piura|San Mart[ií]n|Tacna|Tumbes|Ucayali)(?![a-z])
+department-short	\b(Ica|ICA|Lima|LIMA|Puno|PUNO|Pasco|PASCO)\b
+data-path	/data-cdc|/data-output|carga-enfermedad|/home/rstudio/proyectos|\bpe-bd-[a-z]+
+decision-code	\bD\d{2,3}\b
+limitation-code	\bL-\d+-\d+\b|\bL-[A-Z]\d+-\d+\b|\bH-[A-Z0-9]+-\d+\b
+phase-code	\bKD?[0-3]\b
+run-id	\b20\d{6}-\d{6}\b|\brun-20\d{6}\b
+internal-rule	(?i)\b(regla|pol[ií]tica)\s+\d{2}\b|(?i)\bplan\s+1[0-3][b-f]?\b

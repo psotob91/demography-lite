@@ -1,0 +1,3 @@
+# Reviewed exceptions of the CRAN text control (tools/check-cran-text.R).
+# One per line: rule <TAB> regular expression on "package-relative path" <TAB> reason.
+global-env	^R/import-standalone-draws\.R$	with_cell_seed() saves and restores .Random.seed of the global environment so that the caller's random stream is untouched; nothing else is written there
