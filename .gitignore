@@ -1,0 +1,20 @@
+# R
+.Rhistory
+.RData
+.Rproj.user/
+*.Rcheck/
+*.tar.gz
+
+# renv: the library is never versioned (renv.lock is)
+renv/library/
+renv/local/
+renv/cellar/
+renv/lock/
+renv/python/
+renv/sandbox/
+renv/staging/
+
+# Local outputs: check logs and pkgdown sites are built locally, not published
+check-results/
+*/docs/
+*/pkgdown/
