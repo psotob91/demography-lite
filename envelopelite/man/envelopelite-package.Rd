@@ -16,12 +16,20 @@ This package is an independent implementation. It is not affiliated with,
 endorsed by, or supported by the Institute for Health Metrics and
 Evaluation (IHME), and it does not contain IHME code or data.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/psotob91/demography-lite}
+  \item Report bugs at \url{https://github.com/psotob91/demography-lite/issues}
+}
+
+}
 \author{
-\strong{Maintainer}: TODO PLACEHOLDER \email{todo@example.invalid} (TODO placeholder: names, e-mail and ORCID are set by the repository owner before any release) [copyright holder]
+\strong{Maintainer}: Percy Soto-Becerra \email{percys1991@gmail.com} [copyright holder]
 
 Authors:
 \itemize{
-  \item TODO PLACEHOLDER \email{todo@example.invalid} (TODO placeholder: names, e-mail and ORCID are set by the repository owner before any release) [copyright holder]
+  \item Percy Soto-Becerra \email{percys1991@gmail.com} [copyright holder]
 }
 
 }

@@ -2,9 +2,8 @@ Package: popreconlite
 Title: Population Reconstruction by Cohort Components Between Censuses
 Version: 0.0.0.9000
 Authors@R:
-    person("TODO", "PLACEHOLDER", email = "todo@example.invalid",
-           role = c("aut", "cre", "cph"),
-           comment = "TODO placeholder: names, e-mail and ORCID are set by the repository owner before any release")
+    person("Percy", "Soto-Becerra", email = "percys1991@gmail.com",
+           role = c("aut", "cre", "cph"))
 Description: Reconstructs populations between censuses by cohort components at single
     years of age and annual steps, for both sexes and for areas linked by
     internal migration, with net migration estimated and with paired draws,
@@ -17,6 +16,8 @@ Description: Reconstructs populations between censuses by cohort components at s
     Evaluation (IHME), and it does not contain IHME code or data. It is not
     a successor of the 'popReconstruct' package.
 License: MIT + file LICENSE
+URL: https://github.com/psotob91/demography-lite
+BugReports: https://github.com/psotob91/demography-lite/issues
 Encoding: UTF-8
 Language: en-GB
 Depends:

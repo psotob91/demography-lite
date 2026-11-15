@@ -58,5 +58,4 @@ evl_summarise(x)
 
 ## Licence
 
-MIT. Authors and copyright holder: TODO (placeholders until the repository
-owner sets them).
+MIT. Author, maintainer and copyright holder: Percy Soto-Becerra.

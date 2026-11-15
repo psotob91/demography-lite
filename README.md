@@ -108,12 +108,13 @@ one is tested against a broken case in `tools/tests/`):
 
 These are decisions of the repository owner, not of the tools:
 
-- authors, maintainer e-mail, ORCID and copyright holder (placeholders marked
-  `TODO` in every `DESCRIPTION` and `LICENSE`): the owner has decided to
-  appear as author, maintainer and copyright holder, and the name, the public
-  e-mail address and the ORCID are still missing;
-- create the public repository and push (nothing has been published);
-- add `URL` and `BugReports` to every `DESCRIPTION`;
+- the owner's ORCID, if it is to appear in `Authors@R`. Everything else is
+  set: author, maintainer and copyright holder are Percy Soto-Becerra, with
+  the e-mail address already public on his GitHub profile;
+- the first `git push` to <https://github.com/psotob91/demography-lite>: the
+  repository exists and is empty, and **nothing has been published yet**;
+- whether the three pkgdown sites go on GitHub Pages, and then the `url:`
+  field of each `_pkgdown.yml`, which is still empty;
 - cite, in `ddl_cap()`, the passage of the GBD 2023 demographics appendix that
   states the rule of 95%;
 - human review of everything listed in [`AI-USAGE.md`](AI-USAGE.md), where
@@ -121,4 +122,4 @@ These are decisions of the repository owner, not of the tools:
 
 ## Licence
 
-MIT (see [`LICENSE.md`](LICENSE.md)); copyright holder to be set.
+MIT (see [`LICENSE.md`](LICENSE.md)); copyright holder: Percy Soto-Becerra.

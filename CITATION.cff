@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use these packages, please cite them as below. They are an independent implementation of published methods and are not affiliated with, endorsed by, or supported by the Institute for Health Metrics and Evaluation (IHME)."
+title: "demography-lite: death registration completeness, population reconstruction and the mortality envelope in R"
+type: software
+version: 0.0.0.9000
+license: MIT
+repository-code: "https://github.com/psotob91/demography-lite"
+authors:
+  - family-names: Soto-Becerra
+    given-names: Percy
+    email: percys1991@gmail.com
+abstract: >-
+  Three small R packages for national demographic estimation: ddmlite (completeness of death
+  registration between two censuses by death distribution methods, with explicit net migration),
+  popreconlite (population reconstruction by cohort components at single ages and annual steps,
+  estimating migration) and envelopelite (all-cause deaths as registered deaths divided by
+  completeness, with raking of areas to the national total). Uncertainty travels as paired draws
+  with a seed derived from each cell's labels, so results do not depend on the order of
+  computation. Development version: part of the estimation functions are documented skeletons.
+keywords:
+  - demography
+  - mortality
+  - death registration completeness
+  - population reconstruction
+  - life tables
+  - R
