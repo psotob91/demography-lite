@@ -19,13 +19,13 @@ Column names follow the Global Burden of Disease (GBD) study:
 \item \code{age_start}, \code{age_end} (numeric): exact age in years, start included and
 end excluded, \code{Inf} for the open group. \strong{This pair is the age key.}
 \item \code{age_group_id} (integer, optional): GBD identifier where the user
-supplies the map; see \code{\link[=age_groups]{age_groups()}}.
+supplies the map; see \code{\link[=evl_age_groups]{evl_age_groups()}}.
 }
 }
 
 \section{Draws}{
 
-Every product is a container created with \code{\link[=draws_new]{draws_new()}}: a table of cells
+Every product is a container created with \code{\link[=evl_draws_new]{evl_draws_new()}}: a table of cells
 and a cells x draws matrix. Draw \code{k} is the same "world" in every product:
 envelope \code{k} comes from completeness \code{k}, and rate \code{k} from envelope \code{k}
 and population \code{k}. Consumers must not shuffle or re-order draws. The
@@ -60,7 +60,6 @@ causes of death.
 \seealso{
 Other envelope:
 \code{\link[=evl_envelope]{evl_envelope()}},
-\code{\link[=evl_mx]{evl_mx()}},
-\code{\link[=evl_summarise]{evl_summarise()}}
+\code{\link[=evl_mx]{evl_mx()}}
 }
 \concept{envelope}

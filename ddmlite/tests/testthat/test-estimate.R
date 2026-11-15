@@ -26,16 +26,38 @@ test_that("ddl_combine rejects bad input with a classed error", {
 })
 
 test_that("ddl_cap sets completeness to 1 from the threshold and leaves the rest", {
-  expect_identical(ddl_cap(c(0.62, 0.949, 0.95, 1.08, NA)), c(0.62, 0.949, 1, 1, NA))
-  expect_identical(ddl_cap(0.9, threshold = 0.9), 1)
-  expect_identical(ddl_cap(0.8999, threshold = 0.9), 0.8999)
+  cap <- function(...) suppressWarnings(ddl_cap(...))
+  expect_identical(cap(c(0.62, 0.949, 0.95, 1.08, NA)), c(0.62, 0.949, 1, 1, NA))
+  expect_identical(cap(0.9, threshold = 0.9), 1)
+  expect_identical(cap(0.8999, threshold = 0.9), 0.8999)
   m <- matrix(c(0.5, 0.96, 0.94, 1.2), nrow = 2)
-  expect_identical(ddl_cap(m), matrix(c(0.5, 1, 0.94, 1), nrow = 2))
+  expect_identical(cap(m), matrix(c(0.5, 1, 0.94, 1), nrow = 2))
   # idempotent, never lowers a value below the threshold, never exceeds 1 above it
   x <- seq(0, 1.5, by = 0.01)
-  expect_identical(ddl_cap(ddl_cap(x)), ddl_cap(x))
-  expect_true(all(ddl_cap(x)[x < 0.95] == x[x < 0.95]))
-  expect_true(all(ddl_cap(x)[x >= 0.95] == 1))
+  expect_identical(cap(cap(x)), cap(x))
+  expect_true(all(cap(x)[x < 0.95] == x[x < 0.95]))
+  expect_true(all(cap(x)[x >= 0.95] == 1))
+})
+
+test_that("ddl_cap warns where the threshold decides the result, and nothing else", {
+  # the rule is a jump: values just below the threshold are the ones that the
+  # choice of threshold moves from "inflate the deaths" to "leave them alone"
+  expect_warning(ddl_cap(c(0.62, 0.90, 0.9499)), class = "ddl_warning_threshold")
+  expect_warning(ddl_cap(c(0.62, 0.90, 0.9499)), class = "demolite_warning_threshold")
+  expect_warning(ddl_cap(c(0.62, 0.90, 0.9499)), "jump, not a")
+  expect_warning(ddl_cap(c(0.62, 0.90, 0.9499)), "2 value")
+  # no value in [0.90, 0.95): no warning
+  expect_silent(ddl_cap(c(0.62, 0.8999, 0.95, 1.08, NA)))
+  expect_silent(ddl_cap(matrix(c(0.5, 0.96, 0.89, 1.2), nrow = 2)))
+  # the warning does not change what is returned
+  loud <- withCallingHandlers(
+    ddl_cap(c(0.62, 0.90, 0.9499, 0.95)),
+    warning = function(w) invokeRestart("muffleWarning")
+  )
+  expect_identical(loud, c(0.62, 0.90, 0.9499, 1))
+  # the window follows the threshold
+  expect_silent(ddl_cap(0.93, threshold = 0.99))
+  expect_warning(ddl_cap(0.95, threshold = 0.99), class = "ddl_warning_threshold")
 })
 
 test_that("ddl_cap rejects bad input with a classed error", {

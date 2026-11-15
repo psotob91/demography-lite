@@ -2,7 +2,7 @@
 % Please edit documentation in R/import-standalone-draws.R
 \name{cell_seed}
 \alias{cell_seed}
-\title{Derive the seed of a cell}
+\title{Derive the random state of a cell}
 \usage{
 cell_seed(seed, stream, key = NULL)
 }
@@ -10,24 +10,33 @@ cell_seed(seed, stream, key = NULL)
 \item{seed}{Whole number. The caller's seed. The packages never choose one.}
 
 \item{stream}{String. Name of the random stream, for instance
-\code{"census_error"}. Different streams give unrelated seeds for the same
+\code{"census_error"}. Different streams give unrelated states for the same
 cell.}
 
 \item{key}{Data frame or named list of equal-length vectors identifying the
 cells (one row per cell), or \code{NULL} for a factor common to all cells, in
-which case the seed depends only on \code{seed} and \code{stream}. Column order
+which case the state depends only on \code{seed} and \code{stream}. Column order
 does not matter; column names and values do. Numbers are compared after
 rounding to 15 significant digits.}
 }
 \value{
-An integer vector with one seed per row of \code{key} (length one when
-\code{key} is \code{NULL}), suitable for \code{\link[=with_cell_seed]{with_cell_seed()}}.
+An integer matrix with one row per row of \code{key} (one row when \code{key}
+is \code{NULL}) and six columns: the six words of the state of the
+L'Ecuyer-CMRG generator, encoded as \code{.Random.seed} encodes them, so that a
+word of \eqn{2^{31}} or more appears as a negative integer. One row is
+what \code{\link[=with_cell_seed]{with_cell_seed()}} takes.
 }
 \description{
 Maps the caller's seed, the name of a random stream and the key of a cell to
-a seed for that cell alone. Because the seed depends only on those three
-things, draw \code{k} of a cell is the same whatever the order of the cells and
-however the work is split across processes.
+a state of the L'Ecuyer-CMRG random number generator for that cell alone.
+Because the state is derived from the key and from nothing else, draw \code{k} of
+a cell is the same whatever the order of the cells, however the work is
+split across processes, and whatever cells are added later: a new year of
+data does not move the draws of the cells already computed.
+}
+\details{
+Shared infrastructure, not exported: the packages of the family use it
+inside \verb{<prefix>_draws_generate()}, which is what a user calls.
 }
 \section{GBD equivalent}{
 
@@ -38,25 +47,30 @@ The scheme exists so that results do not depend on execution order.
 \section{Method}{
 
 The text \code{seed|stream|name=value|...} (names sorted in the C locale) is
-hashed with the 32-bit FNV-1a function followed by the final mixing step of
-MurmurHash3, and the result is shifted to the range of R integers. The
-hash is implemented in base R arithmetic, so it gives the same seeds on
-every platform. Limitation: with 32 bits, two of \code{N} cells share a seed with
-probability of about \eqn{N^2 / 2^{33}}; such cells would receive identical
-random numbers within a stream.
+hashed once per word of the state, each time behind its own salt (\code{1#} to
+\code{6#}), with the 32-bit FNV-1a function followed by the final mixing step of
+MurmurHash3. The first three words are then reduced modulo
+\eqn{m_1 = 4294967087} and the last three modulo \eqn{m_2 = 4294944443},
+the moduli of the two components of the generator. A trio of zeros, which
+would stop its half of the generator, becomes a one in its first word; the
+single word \eqn{2^{31}}, which R cannot hold in an integer, becomes
+\eqn{2^{31} + 1}. The hash is implemented in base R arithmetic, so it gives
+the same state on every platform.
+
+Two cells share a state only if all six words agree. Taking the words as
+independent and uniform, the probability that some two of \eqn{N} cells
+share a state is about
+\deqn{N (N - 1) / (2 m_1^3 m_2^3) \approx N^2 / 2^{193}}
+which for a grid of \eqn{N = 168000} cells (25 areas x 2 sexes x 96 ages x
+35 years) is about \eqn{2 \times 10^{-48}}: a collision is not expected
+ever. The same formula for the single 32-bit seed used up to version
+0.0.0.9000, where the space was \eqn{2^{32}}, gives 3.3 expected pairs and a
+probability of 96\% for that grid; the cells of such a pair received
+identical random numbers within a stream. FNV-1a is not a cryptographic
+hash, so labels could be built on purpose to collide; the labels of cells
+are not chosen by an adversary.
 }
 
-\examples{
-cells <- data.frame(location_id = c(1, 2, 3), sex_id = c(1, 1, 2))
-cell_seed(2024, "census_error", cells)
-
-# The seed of a cell does not depend on the order of the cells
-rev(cell_seed(2024, "census_error", cells[3:1, ]))
-
-# A factor common to all cells
-cell_seed(2024, "common_level")
-
-}
 \seealso{
 Other draws:
 \code{\link[=as_draws_long]{as_draws_long()}},
@@ -64,6 +78,12 @@ Other draws:
 \code{\link[=draws_generate]{draws_generate()}},
 \code{\link[=draws_new]{draws_new()}},
 \code{\link[=draws_summarise]{draws_summarise()}},
+\code{\link[=evl_draws_generate]{evl_draws_generate()}},
+\code{\link[=evl_draws_long]{evl_draws_long()}},
+\code{\link[=evl_draws_new]{evl_draws_new()}},
+\code{\link[=evl_draws_wide]{evl_draws_wide()}},
+\code{\link[=evl_summarise]{evl_summarise()}},
 \code{\link[=with_cell_seed]{with_cell_seed()}}
 }
 \concept{draws}
+\keyword{internal}

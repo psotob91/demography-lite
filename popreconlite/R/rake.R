@@ -8,7 +8,7 @@
 #' its inputs and then signals a condition of class
 #' `prl_error_not_implemented`.
 #'
-#' @param areas A `demolite_draws` container (see [draws_new()]) with the
+#' @param areas A `demolite_draws` container (see [prl_draws_new()]) with the
 #'   population of each area by year, sex and age (persons).
 #' @param national A `demolite_draws` container with the national population
 #'   for the same years, sexes and ages and the same number of draws.
@@ -37,10 +37,10 @@
 #' Mathematical Statistics*, 11, 427-444. \doi{10.1214/aoms/1177731829}
 #'
 #' @examples
-#' areas <- draws_new(data.frame(location_id = 2:3, year_id = 2005L),
+#' areas <- prl_draws_new(data.frame(location_id = 2:3, year_id = 2005L),
 #'                    matrix(c(100, 210, 104, 205), nrow = 2),
 #'                    measure = "population", unit = "persons")
-#' national <- draws_new(data.frame(location_id = 1L, year_id = 2005L),
+#' national <- prl_draws_new(data.frame(location_id = 1L, year_id = 2005L),
 #'                       matrix(c(318, 300), nrow = 1),
 #'                       measure = "population", unit = "persons")
 #' # Skeleton: valid inputs reach the "not implemented" condition.
@@ -91,7 +91,7 @@ prl_rake <- function(areas, national) {
 #' and empirical coverage of the 95% interval at the held-out census.
 #'
 #' @examples
-#' sim <- simulate_country(seed = 1, n_areas = 1, stochastic = FALSE)
+#' sim <- prl_country(seed = 1, n_areas = 1, stochastic = FALSE)
 #' # Skeleton: `spec` objects cannot be created yet, so the call stops at
 #' # input validation.
 #' tryCatch(

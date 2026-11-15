@@ -4,7 +4,7 @@
 \alias{evl_abridge}
 \title{Abridge a single-year life table}
 \usage{
-evl_abridge(lifetable, groups = age_groups("abridged"))
+evl_abridge(lifetable, groups = evl_age_groups("abridged"))
 }
 \arguments{
 \item{lifetable}{Data frame or data.table with a single-year life table in
@@ -12,7 +12,7 @@ the layout of \code{\link[=evl_lifetable]{evl_lifetable()}}: at least \code{age_
 and \code{nLx}.}
 
 \item{groups}{Data frame or data.table with the target age groups
-(\code{age_start}, \code{age_end}), \code{age_groups("abridged")} by default.}
+(\code{age_start}, \code{age_end}), \code{evl_age_groups("abridged")} by default.}
 }
 \value{
 When implemented, a data.table with one row per target age group,

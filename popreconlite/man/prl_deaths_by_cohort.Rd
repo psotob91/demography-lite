@@ -48,7 +48,7 @@ input.
 }
 
 \examples{
-sim <- simulate_country(seed = 1, n_areas = 1)
+sim <- prl_country(seed = 1, n_areas = 1)
 deaths <- sim$deaths
 deaths$deaths <- deaths$deaths_registered
 # Skeleton: `interval` objects cannot be created yet, so the call stops at

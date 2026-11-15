@@ -45,7 +45,7 @@ documented when the function is implemented.
 }
 
 \examples{
-groups <- age_groups("five_year")
+groups <- prl_age_groups("five_year")
 pop <- rev(seq(100, 2000, length.out = nrow(groups)))
 # Skeleton: valid inputs reach the "not implemented" condition.
 tryCatch(

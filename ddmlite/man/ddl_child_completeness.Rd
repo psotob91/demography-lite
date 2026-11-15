@@ -23,7 +23,7 @@ standard error, proportion).}
 \item{seed}{Whole number. The caller's seed; the package never chooses one.}
 }
 \value{
-When implemented, a \code{demolite_draws} container (see \code{\link[=draws_new]{draws_new()}})
+When implemented, a \code{demolite_draws} container (see \code{\link[=ddl_draws_new]{ddl_draws_new()}})
 with one row per cell and the measure \code{"completeness"} (proportion, not
 capped at 1).
 }

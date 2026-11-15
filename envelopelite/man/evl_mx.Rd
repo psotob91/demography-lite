@@ -7,7 +7,7 @@
 evl_mx(envelope, population)
 }
 \arguments{
-\item{envelope}{A \code{demolite_draws} container (see \code{\link[=draws_new]{draws_new()}}) with the
+\item{envelope}{A \code{demolite_draws} container (see \code{\link[=evl_draws_new]{evl_draws_new()}}) with the
 measure \code{"deaths"} (count).}
 
 \item{population}{A \code{demolite_draws} container with the measure
@@ -45,9 +45,9 @@ when the function is implemented.
 \examples{
 cells <- data.frame(location_id = 1L, year_id = 2005L, sex_id = 1L,
                     age_start = c(50, 51), age_end = c(51, 52))
-deaths <- draws_new(cells, matrix(c(10, 12, 11, 13), nrow = 2),
+deaths <- evl_draws_new(cells, matrix(c(10, 12, 11, 13), nrow = 2),
                     measure = "deaths", unit = "count")
-pop <- draws_new(cells, matrix(c(2000, 1900, 2010, 1890), nrow = 2),
+pop <- evl_draws_new(cells, matrix(c(2000, 1900, 2010, 1890), nrow = 2),
                  measure = "population", unit = "persons")
 # Skeleton: valid inputs reach the "not implemented" condition.
 tryCatch(
@@ -59,7 +59,6 @@ tryCatch(
 \seealso{
 Other envelope:
 \code{\link{envelopelite-contract}},
-\code{\link[=evl_envelope]{evl_envelope()}},
-\code{\link[=evl_summarise]{evl_summarise()}}
+\code{\link[=evl_envelope]{evl_envelope()}}
 }
 \concept{envelope}

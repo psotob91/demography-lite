@@ -116,6 +116,10 @@ completeness planted in each area, and the deaths that end up registered.
 Because the truth is known, the output is the test bed for every method of
 the family. No number, name or structure is taken from any real country.
 }
+\details{
+Shared infrastructure, not exported: every package of the family exports a
+thin wrapper of it under its own prefix, \verb{<prefix>_country()}.
+}
 \section{GBD equivalent}{
 
 \strong{Own.} The Global Burden of Disease (GBD) study does not publish a
@@ -156,23 +160,14 @@ method degrades: a closed population (\code{international_migration_rate},
 Completeness that changes over time is not simulated yet.
 }
 
-\examples{
-sim <- simulate_country(seed = 2024, n_areas = 2)
-sim
-
-# Aggregating recovers the planted completeness (ages 5 and over)
-d <- sim$deaths[sim$deaths$age_start >= 5, ]
-observed <- tapply(d$deaths_registered, d$location_id, sum) /
-  tapply(d$deaths_true, d$location_id, sum)
-cbind(sim$truth$completeness, observed = as.numeric(observed))
-
-}
 \references{
 Rogers A, Castro LJ (1981). \emph{Model Migration Schedules}. Research Report
 RR-81-30. Laxenburg: International Institute for Applied Systems Analysis.
 }
 \seealso{
 Other simulation:
+\code{\link[=ddl_country]{ddl_country()}},
 \code{\link[=ddl_simulate]{ddl_simulate()}}
 }
 \concept{simulation}
+\keyword{internal}

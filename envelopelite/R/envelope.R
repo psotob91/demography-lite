@@ -11,9 +11,9 @@
 #' @param registered Data frame or data.table with one row per cell:
 #'   `location_id`, `year_id`, `sex_id`, `age_start`, `age_end` and `deaths`
 #'   (registered deaths, count). Ages under 5 use the six groups of
-#'   `age_groups("gbd_u5")`, so that the envelope keeps the four groups under
+#'   `evl_age_groups("gbd_u5")`, so that the envelope keeps the four groups under
 #'   1 year.
-#' @param completeness A `demolite_draws` container (see [draws_new()]) with
+#' @param completeness A `demolite_draws` container (see [evl_draws_new()]) with
 #'   the measure `"completeness"` (proportion) by location, year, sex and age
 #'   band.
 #'
@@ -36,8 +36,8 @@
 #' age groups of deaths will be documented when the function is implemented.
 #'
 #' @examples
-#' sim <- simulate_country(seed = 1, n_areas = 1)
-#' completeness <- draws_new(
+#' sim <- evl_country(seed = 1, n_areas = 1)
+#' completeness <- evl_draws_new(
 #'   data.frame(location_id = 1:2),
 #'   matrix(c(0.80, 0.80, 0.82, 0.82), nrow = 2),
 #'   measure = "completeness", unit = "proportion"
@@ -70,7 +70,7 @@ evl_envelope <- function(registered, completeness) {
 #' its inputs and then signals a condition of class
 #' `evl_error_not_implemented`.
 #'
-#' @param envelope A `demolite_draws` container (see [draws_new()]) with the
+#' @param envelope A `demolite_draws` container (see [evl_draws_new()]) with the
 #'   measure `"deaths"` (count).
 #' @param population A `demolite_draws` container with the measure
 #'   `"population"` (persons at mid-year, taken as person-years), the same
@@ -93,9 +93,9 @@ evl_envelope <- function(registered, completeness) {
 #' @examples
 #' cells <- data.frame(location_id = 1L, year_id = 2005L, sex_id = 1L,
 #'                     age_start = c(50, 51), age_end = c(51, 52))
-#' deaths <- draws_new(cells, matrix(c(10, 12, 11, 13), nrow = 2),
+#' deaths <- evl_draws_new(cells, matrix(c(10, 12, 11, 13), nrow = 2),
 #'                     measure = "deaths", unit = "count")
-#' pop <- draws_new(cells, matrix(c(2000, 1900, 2010, 1890), nrow = 2),
+#' pop <- evl_draws_new(cells, matrix(c(2000, 1900, 2010, 1890), nrow = 2),
 #'                  measure = "population", unit = "persons")
 #' # Skeleton: valid inputs reach the "not implemented" condition.
 #' tryCatch(
@@ -126,46 +126,4 @@ evl_mx <- function(envelope, population) {
                 "."))
   }
   invisible(TRUE)
-}
-
-#' Summarise draws: mean and uncertainty interval
-#'
-#' Reduces every cell of a container of draws to its mean and to the limits
-#' of its uncertainty interval. The central estimate is the mean of the
-#' draws.
-#'
-#' **Status: implemented** as a call to [draws_summarise()].
-#'
-#' @param draws A `demolite_draws` container (see [draws_new()]).
-#' @param probs Numeric vector of length two. Lower and upper probabilities of
-#'   the interval, `c(0.025, 0.975)` by default.
-#'
-#' @return A data.table with the cells of `draws` and the numeric columns
-#'   `mean`, `lower` and `upper`, in the unit of the container.
-#'
-#' @section GBD equivalent:
-#' **Replicates** the convention of the Global Burden of Disease (GBD) study:
-#' the mean of the draws as point estimate and the 2.5th and 97.5th
-#' percentiles as 95% uncertainty interval.
-#'
-#' @section Method:
-#' See [draws_summarise()]. Aggregate draws first and summarise last: the
-#' interval of a sum is not the sum of the intervals.
-#'
-#' @references
-#' GBD 2023 Demographics Collaborators (2025). Global age-sex-specific
-#' all-cause mortality and life expectancy estimates for 204 countries and
-#' territories. *The Lancet*, 406, 1731-1810.
-#' \doi{10.1016/S0140-6736(25)01330-3}
-#'
-#' @examples
-#' cells <- data.frame(location_id = 1:2)
-#' value <- rbind(seq(90, 110, length.out = 41), seq(40, 60, length.out = 41))
-#' deaths <- draws_new(cells, value, measure = "deaths", unit = "count")
-#' evl_summarise(deaths)
-#'
-#' @family envelope
-#' @export
-evl_summarise <- function(draws, probs = c(0.025, 0.975)) {
-  draws_summarise(draws, probs = probs)
 }

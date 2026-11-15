@@ -25,6 +25,10 @@ Reduces each cell to its mean and to two percentiles of its draws. Across
 the family the central estimate is the mean of the draws and the 95\%
 uncertainty interval runs from the 2.5th to the 97.5th percentile.
 }
+\details{
+Shared infrastructure, not exported: every package of the family exports a
+thin wrapper of it under its own prefix, \verb{<prefix>_summarise()}.
+}
 \section{GBD equivalent}{
 
 \strong{Replicates} the convention of the GBD study: mean of the draws as the
@@ -40,13 +44,6 @@ the order statistics (type 7 of \code{\link[stats:quantile]{stats::quantile()}})
 is not the sum of the summaries: aggregate draws first, then summarise.
 }
 
-\examples{
-index <- data.frame(location_id = c(1, 2))
-value <- rbind(seq(0.70, 0.90, length.out = 41), seq(0.50, 0.60, length.out = 41))
-x <- draws_new(index, value, measure = "completeness", unit = "proportion")
-draws_summarise(x)
-
-}
 \references{
 GBD 2023 Demographics Collaborators (2025). Global age-sex-specific
 all-cause mortality and life expectancy estimates for 204 countries and
@@ -58,8 +55,14 @@ Other draws:
 \code{\link[=as_draws_long]{as_draws_long()}},
 \code{\link[=as_draws_wide]{as_draws_wide()}},
 \code{\link[=cell_seed]{cell_seed()}},
+\code{\link[=ddl_draws_generate]{ddl_draws_generate()}},
+\code{\link[=ddl_draws_long]{ddl_draws_long()}},
+\code{\link[=ddl_draws_new]{ddl_draws_new()}},
+\code{\link[=ddl_draws_wide]{ddl_draws_wide()}},
+\code{\link[=ddl_summarise]{ddl_summarise()}},
 \code{\link[=draws_generate]{draws_generate()}},
 \code{\link[=draws_new]{draws_new()}},
 \code{\link[=with_cell_seed]{with_cell_seed()}}
 }
 \concept{draws}
+\keyword{internal}

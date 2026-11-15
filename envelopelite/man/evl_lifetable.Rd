@@ -66,7 +66,7 @@ group will be documented when the function is implemented.
 }
 
 \examples{
-ages <- age_groups("single")
+ages <- evl_age_groups("single")
 mx <- 0.0003 + 0.00003 * exp(0.095 * ages$age_start)
 # Skeleton: valid inputs reach the "not implemented" condition.
 tryCatch(

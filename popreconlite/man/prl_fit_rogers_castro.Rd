@@ -40,7 +40,7 @@ function is implemented.
 }
 
 \examples{
-groups <- age_groups("five_year")
+groups <- prl_age_groups("five_year")
 share <- rep(1 / nrow(groups), nrow(groups))
 # Skeleton: valid inputs reach the "not implemented" condition.
 tryCatch(

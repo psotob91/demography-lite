@@ -58,7 +58,7 @@ ddl_smooth_series <- function(completeness, breaks = NULL) {
 #' its inputs and then signals a condition of class
 #' `ddl_error_not_implemented`.
 #'
-#' @param areas A `demolite_draws` container (see [draws_new()]) with the
+#' @param areas A `demolite_draws` container (see [ddl_draws_new()]) with the
 #'   estimated deaths of each area (registered deaths divided by completeness,
 #'   count), one row per area and stratum.
 #' @param national A `demolite_draws` container with the same strata for the
@@ -79,10 +79,10 @@ ddl_smooth_series <- function(completeness, breaks = NULL) {
 #' \eqn{k} and \eqn{\hat{D}_{0,k}} the national estimate in the same draw.
 #'
 #' @examples
-#' areas <- draws_new(data.frame(location_id = 2:3, sex_id = 1L),
+#' areas <- ddl_draws_new(data.frame(location_id = 2:3, sex_id = 1L),
 #'                    matrix(c(100, 210, 104, 205), nrow = 2),
 #'                    measure = "deaths", unit = "count")
-#' national <- draws_new(data.frame(location_id = 1L, sex_id = 1L),
+#' national <- ddl_draws_new(data.frame(location_id = 1L, sex_id = 1L),
 #'                       matrix(c(318, 300), nrow = 1),
 #'                       measure = "deaths", unit = "count")
 #' # Skeleton: valid inputs reach the "not implemented" condition.

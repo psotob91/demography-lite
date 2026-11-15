@@ -54,6 +54,10 @@ per cell and one column per draw. Draw \code{k} is the same simulated "world" in
 every container that descends from the same inputs, so containers must never
 be shuffled or re-ordered along the draw dimension.
 }
+\details{
+Shared infrastructure, not exported: every package of the family exports a
+thin wrapper of it under its own prefix, \verb{<prefix>_draws_new()}.
+}
 \section{GBD equivalent}{
 
 \strong{Own.} The Global Burden of Disease (GBD) study exchanges draws as wide
@@ -70,24 +74,19 @@ cells, identifiers stored as integers, and age identified by exact
 \code{age_start} and \code{age_end}.
 }
 
-\examples{
-index <- data.frame(location_id = c(1, 2), sex_id = c(1, 1))
-value <- matrix(c(0.80, 0.90, 0.82, 0.88, 0.78, 0.91), nrow = 2)
-x <- draws_new(index, value, measure = "completeness", unit = "proportion")
-x
-
-# The same container from a long table
-long <- as_draws_long(x)
-identical(draws_new(long, measure = "completeness")$value, x$value)
-
-}
 \seealso{
 Other draws:
 \code{\link[=as_draws_long]{as_draws_long()}},
 \code{\link[=as_draws_wide]{as_draws_wide()}},
 \code{\link[=cell_seed]{cell_seed()}},
+\code{\link[=ddl_draws_generate]{ddl_draws_generate()}},
+\code{\link[=ddl_draws_long]{ddl_draws_long()}},
+\code{\link[=ddl_draws_new]{ddl_draws_new()}},
+\code{\link[=ddl_draws_wide]{ddl_draws_wide()}},
+\code{\link[=ddl_summarise]{ddl_summarise()}},
 \code{\link[=draws_generate]{draws_generate()}},
 \code{\link[=draws_summarise]{draws_summarise()}},
 \code{\link[=with_cell_seed]{with_cell_seed()}}
 }
 \concept{draws}
+\keyword{internal}

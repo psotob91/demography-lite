@@ -13,16 +13,21 @@ It is not a successor of the 'DDM' or 'DDMethods' packages. Child mortality from
 
 ## What works today
 
-Shared infrastructure of the family (identical in the three packages):
+Shared infrastructure of the family. The code is the same in the three
+packages and is internal, so attaching two of them masks nothing; each package
+exports it under its own prefix:
 
-- `draws_new()`, `as_draws_long()`, `as_draws_wide()`, `draws_summarise()`,
-  `draws_generate()`: a container of draws (cells x draws matrix plus a table
-  of cells) and its summary (mean, 2.5th and 97.5th percentiles).
-- `cell_seed()`, `with_cell_seed()`: per-cell seeds, so that draw `k` of a cell
-  is the same whatever the order of the cells or the split across processes.
-- `age_groups()`: age groups identified by exact start and end, including the
-  six groups under 5 years of the Global Burden of Disease (GBD) study.
-- `simulate_country()`: a small, fully invented country with planted truth.
+- `ddl_draws_new()`, `ddl_draws_long()`, `ddl_draws_wide()`,
+  `ddl_summarise()`, `ddl_draws_generate()`: a container of draws (cells x
+  draws matrix plus a table of cells), its conversions and its summary (mean,
+  2.5th and 97.5th percentiles). Containers can be passed from one package of
+  the family to another.
+- `ddl_draws_generate()` draws cell by cell under a random state derived from
+  the key of the cell, so that draw `k` of a cell is the same whatever the
+  order of the cells, the split across processes, or the cells added later.
+- `ddl_age_groups()`: age groups identified by exact start and end, including
+  the six groups under 5 years of the Global Burden of Disease (GBD) study.
+- `ddl_country()`: a small, fully invented country with planted truth.
 
 Functions of this package that are implemented:
 
@@ -44,14 +49,14 @@ install.packages("path/to/demography-lite/ddmlite", repos = NULL, type = "source
 
 ```r
 library(ddmlite)
-sim <- simulate_country(seed = 2024, n_areas = 2)
+sim <- ddl_country(seed = 2024, n_areas = 2)
 sim$truth$completeness
 
 cells <- data.frame(location_id = 1:3)
-x <- draws_generate(cells, n_draws = 100, seed = 2024, stream = "example",
-                    generator = function(n, cell) stats::rnorm(n),
-                    measure = "example")
-draws_summarise(x)
+x <- ddl_draws_generate(cells, n_draws = 100, seed = 2024, stream = "example",
+                        generator = function(n, cell) stats::rnorm(n),
+                        measure = "example")
+ddl_summarise(x)
 ```
 
 ## Licence

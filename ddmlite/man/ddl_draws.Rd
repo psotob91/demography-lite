@@ -40,7 +40,7 @@ census (standard deviation, proportion).}
 migration, \code{"with"} and \code{"without"} run one variant.}
 }
 \value{
-When implemented, a \code{demolite_draws} container (see \code{\link[=draws_new]{draws_new()}})
+When implemented, a \code{demolite_draws} container (see \code{\link[=ddl_draws_new]{ddl_draws_new()}})
 with one row per cell, method and migration variant, and the measure
 \code{"completeness"} (proportion).
 }

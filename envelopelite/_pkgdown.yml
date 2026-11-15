@@ -4,22 +4,30 @@ template:
 reference:
 - title: Envelope, life table and scaling
   contents:
-  - starts_with('evl_')
+  - evl_envelope
+  - evl_mx
+  - evl_lifetable
+  - evl_abridge
+  - evl_close_open_age
+  - evl_aggregate
+  - evl_rake
+  - evl_rake_mismatch
 - title: Data contract
   contents:
   - 'envelopelite-contract'
 - title: Simulated data with planted truth
   contents:
-  - simulate_country
-- title: Draws and per-cell seeds
+  - evl_country
+- title: Draws
   contents:
-  - draws_new
-  - as_draws_long
-  - as_draws_wide
-  - draws_summarise
-  - draws_generate
-  - cell_seed
-  - with_cell_seed
+  - evl_draws_new
+  - evl_draws_long
+  - evl_draws_wide
+  - evl_summarise
+  - evl_draws_generate
 - title: Age groups
   contents:
-  - age_groups
+  - evl_age_groups
+- title: Shared infrastructure of the family (internal, not exported)
+  contents:
+  - has_keyword("internal")

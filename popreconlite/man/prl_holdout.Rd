@@ -43,7 +43,7 @@ and empirical coverage of the 95\% interval at the held-out census.
 }
 
 \examples{
-sim <- simulate_country(seed = 1, n_areas = 1, stochastic = FALSE)
+sim <- prl_country(seed = 1, n_areas = 1, stochastic = FALSE)
 # Skeleton: `spec` objects cannot be created yet, so the call stops at
 # input validation.
 tryCatch(

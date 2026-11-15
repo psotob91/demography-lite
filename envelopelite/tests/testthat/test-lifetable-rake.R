@@ -50,7 +50,12 @@ test_that("the list of implemented and skeleton functions is the declared one", 
   own <- sort(grep("^evl_", exported, value = TRUE))
   skeleton <- c("evl_abridge", "evl_aggregate", "evl_close_open_age", "evl_envelope",
                 "evl_lifetable", "evl_mx", "evl_rake", "evl_rake_mismatch")
-  expect_identical(own, sort(c("evl_summarise", skeleton)))
+  shared <- c("evl_age_groups", "evl_country", "evl_draws_generate",
+              "evl_draws_long", "evl_draws_new", "evl_draws_wide",
+              "evl_summarise")
+  expect_identical(own, sort(c(shared, skeleton)))
+  # the shared wrappers are thin: they call the internal function and nothing
+  # else, so none of them is a skeleton
   is_skeleton <- vapply(own, function(f) {
     any(grepl(".dl_not_implemented", deparse(body(get(f))), fixed = TRUE))
   }, logical(1))

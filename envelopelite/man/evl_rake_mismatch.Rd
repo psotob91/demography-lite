@@ -7,7 +7,7 @@
 evl_rake_mismatch(children, parent)
 }
 \arguments{
-\item{children}{A \code{demolite_draws} container (see \code{\link[=draws_new]{draws_new()}}) with an
+\item{children}{A \code{demolite_draws} container (see \code{\link[=evl_draws_new]{evl_draws_new()}}) with an
 additive measure (for instance \code{"deaths"}, count) for the areas, one row
 per area and stratum.}
 
@@ -42,10 +42,10 @@ with the notation of \code{\link[=evl_rake]{evl_rake()}}.
 }
 
 \examples{
-children <- draws_new(data.frame(location_id = 2:3, sex_id = 1L),
+children <- evl_draws_new(data.frame(location_id = 2:3, sex_id = 1L),
                       matrix(c(100, 210, 104, 205), nrow = 2),
                       measure = "deaths", unit = "count")
-parent <- draws_new(data.frame(location_id = 1L, sex_id = 1L),
+parent <- evl_draws_new(data.frame(location_id = 1L, sex_id = 1L),
                     matrix(c(318, 300), nrow = 1),
                     measure = "deaths", unit = "count")
 # Skeleton: valid inputs reach the "not implemented" condition.

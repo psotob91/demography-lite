@@ -24,7 +24,7 @@
 #' @param n_draws Whole number. Number of draws.
 #' @param seed Whole number. The caller's seed; the package never chooses one.
 #'
-#' @return When implemented, a `demolite_draws` container (see [draws_new()])
+#' @return When implemented, a `demolite_draws` container (see [ddl_draws_new()])
 #'   with one row per cell and the measure `"completeness"` (proportion, not
 #'   capped at 1).
 #'

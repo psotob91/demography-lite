@@ -1,11 +1,11 @@
 #' Simulated inputs for the death distribution methods
 #'
-#' Runs [simulate_country()] and arranges its output as the inputs of the
+#' Runs [ddl_country()] and arranges its output as the inputs of the
 #' death distribution methods: two censuses, mean annual registered deaths and
 #' mean annual net migrants by five-year age group, with the completeness that
 #' was planted.
 #'
-#' **Status: implemented** as a thin wrapper of [simulate_country()].
+#' **Status: implemented** as a thin wrapper of [ddl_country()].
 #'
 #' @param seed Whole number. The caller's seed; the package never chooses one.
 #' @param completeness Number in `(0, 1]`. Proportion of deaths registered,
@@ -21,7 +21,7 @@
 #' @param location_id,sex_id Whole numbers. Location and sex returned as
 #'   vectors. With the default single area, locations 1 (national) and 2 (the
 #'   area) are identical.
-#' @param ... Other arguments passed to [simulate_country()], for instance
+#' @param ... Other arguments passed to [ddl_country()], for instance
 #'   `n_areas` or `census_dates`.
 #'
 #' @return A list with
@@ -38,14 +38,14 @@
 #'     `deaths`, `net_migrants`), the layout that [ddl_estimate()] takes;
 #'   * `truth`: a list with the planted `completeness`, `census_coverage` and
 #'     `net_rate`;
-#'   * `country`: the full output of [simulate_country()].
+#'   * `country`: the full output of [ddl_country()].
 #'
 #' @section GBD equivalent:
-#' **Own.** See [simulate_country()].
+#' **Own.** See [ddl_country()].
 #'
 #' @section Method:
 #' The country is simulated by cohort-component accounting (see
-#' [simulate_country()]), which is a different rule from the one used by the
+#' [ddl_country()]), which is a different rule from the one used by the
 #' methods under test. Single years of age are added up to five-year groups;
 #' deaths and migrants of the intercensal period are divided by its length.
 #'

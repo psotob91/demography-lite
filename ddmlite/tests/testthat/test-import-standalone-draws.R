@@ -4,6 +4,11 @@
 cells <- data.frame(location_id = c(1, 2, 3), sex_id = c(1, 1, 2),
                     age_start = c(0, 7 / 365.25, 95), age_end = c(1, 1, Inf))
 
+# Name of the package that carries this copy of the shared code.
+.dl_test_package <- function() {
+  environmentName(topenv(environment(draws_new)))
+}
+
 test_that("draws_new builds the container and stores identifiers as integers", {
   value <- matrix(seq_len(12) / 10, nrow = 3)
   x <- draws_new(cells, value, measure = "completeness", unit = "proportion",
@@ -120,18 +125,65 @@ test_that("the hash matches published and independently computed values", {
   expect_identical(.dl_xor32(4294967295, 1), 4294967294)
 })
 
-test_that("cell seeds are frozen: changing them would change every draw", {
-  expect_identical(cell_seed(2024, "census_error", cells[, 1:3]),
-                   c(1890716733L, 461587252L, 958312902L))
-  expect_identical(cell_seed(2024, "common"), 649857026L)
+test_that("the state of a cell is frozen: changing it would change every draw", {
+  # Written in another R session and pasted here: the same label must give the
+  # same six words in any session, on any platform.
+  expect_identical(
+    cell_seed(2024, "census_error", cells[, 1:3]),
+    matrix(c(1857579057L, 781404387L, 327483606L, 1904353086L, -346500527L,
+             -1796578591L, -157479439L, 2077536727L, -32531684L, -163837812L,
+             592522190L, -26886647L, -1451471773L, 296144898L, -737406288L,
+             2017449601L, 1302336732L, 1670292682L),
+           nrow = 3L, ncol = 6L, byrow = TRUE)
+  )
+  expect_identical(cell_seed(2024, "common"),
+                   matrix(c(-1607432789L, 849290226L, -1288755409L, 943386678L,
+                            -483569264L, 393260045L), nrow = 1L))
+  # the same state gives the same numbers, another state gives others
+  st <- cell_seed(2024, "census_error", cells[, 1:3])
+  expect_identical(
+    with_cell_seed(st[1, ], stats::rnorm(3)),
+    c(-1.9837435362046558, 0.15626956364709027, -0.090313955165843771)
+  )
+  expect_false(identical(with_cell_seed(st[2, ], stats::rnorm(3)),
+                         with_cell_seed(st[1, ], stats::rnorm(3))))
 })
 
-test_that("the seed of a cell depends only on seed, stream and key", {
+test_that("the state of a cell is one the generator accepts", {
+  # R silently re-randomises a state it considers invalid, which would throw
+  # reproducibility away without saying so: the first three words must stay
+  # below m1, the last three below m2, neither trio all zero, and no word may
+  # be 2^31, which an R integer cannot hold.
+  grid <- expand.grid(location_id = 1:25, year_id = 2001:2010, sex_id = 1:2,
+                      age_start = 0:9)
+  st <- cell_seed(1, "grid", grid)
+  expect_identical(dim(st), c(5000L, 6L))
+  expect_type(st, "integer")
+  expect_false(anyNA(st))
+  u <- ifelse(st < 0, st + 4294967296, st)
+  expect_true(all(u[, 1:3] < 4294967087))
+  expect_true(all(u[, 4:6] < 4294944443))
+  expect_true(all(rowSums(u[, 1:3]) > 0))
+  expect_true(all(rowSums(u[, 4:6]) > 0))
+  # and the whole state is unique cell by cell on this grid
+  expect_identical(anyDuplicated(do.call(paste, c(as.data.frame(st), sep = "|"))), 0L)
+  # the words of a cell are not copies of one another
+  expect_identical(anyDuplicated(as.vector(st[1, ])), 0L)
+  # a state with a trio of zeros, or a word out of range, is refused
+  expect_error(with_cell_seed(c(0L, 0L, 0L, 1L, 2L, 3L), 1),
+               class = "demolite_error_input")
+  expect_error(with_cell_seed(c(1L, 2L, 3L, 0L, 0L, 0L), 1),
+               class = "demolite_error_input")
+  expect_error(with_cell_seed(c(1L, 2L, 3L, 4L, 5L), 1),
+               class = "demolite_error_input")
+  expect_error(with_cell_seed(2147483647L, 1), class = "demolite_error_input")
+})
+
+test_that("the state of a cell depends only on seed, stream and key", {
   s <- cell_seed(2024, "census_error", cells)
-  expect_type(s, "integer")
-  expect_false(anyNA(s))
+  expect_identical(dim(s), c(3L, 6L))
   # order of the cells
-  expect_identical(cell_seed(2024, "census_error", cells[3:1, ]), rev(s))
+  expect_identical(cell_seed(2024, "census_error", cells[3:1, ]), s[3:1, ])
   # order of the columns
   expect_identical(cell_seed(2024, "census_error", cells[, 4:1]), s)
   # integer or double identifiers, data frame or list
@@ -139,9 +191,9 @@ test_that("the seed of a cell depends only on seed, stream and key", {
   int$location_id <- as.integer(int$location_id)
   expect_identical(cell_seed(2024, "census_error", int), s)
   expect_identical(cell_seed(2024, "census_error", as.list(cells)), s)
-  # a subset of cells (as when the work is split) gets the same seeds
-  expect_identical(cell_seed(2024, "census_error", cells[2, ]), s[2])
-  # another stream, seed or key gives other seeds
+  # a subset of cells (as when the work is split) gets the same state
+  expect_identical(cell_seed(2024, "census_error", cells[2, ]), s[2, , drop = FALSE])
+  # another stream, seed or key gives another state
   expect_false(any(cell_seed(2024, "deaths_error", cells) == s))
   expect_false(any(cell_seed(2025, "census_error", cells) == s))
   expect_false(any(cell_seed(2024, "census_error", cells[, 1:2]) == s))
@@ -152,37 +204,33 @@ test_that("the seed of a cell depends only on seed, stream and key", {
   expect_error(cell_seed("a", "s"), class = "demolite_error_input")
 })
 
-test_that("seeds do not collide on a grid of five thousand cells", {
-  grid <- expand.grid(location_id = 1:25, year_id = 2001:2010, sex_id = 1:2,
-                      age_start = 0:9)
-  s <- cell_seed(1, "grid", grid)
-  expect_identical(length(s), 5000L)
-  expect_identical(anyDuplicated(s), 0L)
-})
-
 test_that("with_cell_seed is reproducible and restores the generator", {
+  state <- cell_seed(2024, "example", data.frame(location_id = 1))[1, ]
+  other <- cell_seed(2024, "example", data.frame(location_id = 2))[1, ]
   set.seed(99)
   before <- get(".Random.seed", envir = globalenv())
-  a <- with_cell_seed(123L, stats::rnorm(4))
-  b <- with_cell_seed(123L, stats::rnorm(4))
+  a <- with_cell_seed(state, stats::rnorm(4))
+  b <- with_cell_seed(state, stats::rnorm(4))
   expect_identical(a, b)
   expect_identical(get(".Random.seed", envir = globalenv()), before)
-  expect_false(identical(a, with_cell_seed(124L, stats::rnorm(4))))
+  expect_false(identical(a, with_cell_seed(other, stats::rnorm(4))))
+  # a matrix of one row is the same thing as its vector
+  expect_identical(with_cell_seed(matrix(state, nrow = 1L), stats::rnorm(4)), a)
   # the state is restored even if the code fails
-  expect_error(with_cell_seed(123L, stop("x")))
+  expect_error(with_cell_seed(state, stop("x")))
   expect_identical(get(".Random.seed", envir = globalenv()), before)
-  # the kind of generator of the caller is restored too
+  # the kind of generator of the caller is restored too, L'Ecuyer-CMRG included
   old <- RNGkind("L'Ecuyer-CMRG")
   set.seed(5)
-  state <- get(".Random.seed", envir = globalenv())
-  c1 <- with_cell_seed(123L, stats::rnorm(4))
+  kept <- get(".Random.seed", envir = globalenv())
+  c1 <- with_cell_seed(state, stats::rnorm(4))
   expect_identical(c1, a)
   expect_identical(RNGkind()[1], "L'Ecuyer-CMRG")
-  expect_identical(get(".Random.seed", envir = globalenv()), state)
+  expect_identical(get(".Random.seed", envir = globalenv()), kept)
   RNGkind(old[1], old[2], old[3])
   # no generator state before the call: none is left behind
   rm(".Random.seed", envir = globalenv())
-  d <- with_cell_seed(123L, stats::rnorm(4))
+  d <- with_cell_seed(state, stats::rnorm(4))
   expect_identical(d, a)
   expect_false(exists(".Random.seed", envir = globalenv(), inherits = FALSE))
   set.seed(NULL)
@@ -232,13 +280,24 @@ test_that("draws_generate leaves the caller's random stream untouched", {
 
 test_that("the print methods are registered once and dispatch from outside", {
   # Look in the registry of the generic and dispatch from the global
-  # environment: from inside the package its own copy is always visible.
+  # environment: from inside the package its own copy is always visible and
+  # proves nothing.
   registry <- get(".__S3MethodsTable__.", envir = baseenv())
-  expect_true(exists("print.demolite_draws", envir = registry, inherits = FALSE))
-  expect_true(exists("print.demolite_country", envir = registry, inherits = FALSE))
-  before <- get("print.demolite_draws", envir = registry)
-  .dl_register_print()
-  expect_identical(get("print.demolite_draws", envir = registry), before)
+  for (cls in c("demolite_draws", "demolite_country")) {
+    name <- paste0("print.", cls)
+    expect_true(exists(name, envir = registry, inherits = FALSE))
+    registered <- get(name, envir = registry)
+    own <- get(name, envir = asNamespace(.dl_test_package()), inherits = FALSE)
+    # The same object, not merely the same code: that is what keeps a second
+    # package of the family from overwriting the method of the first one, and
+    # what makes the order of loading irrelevant.
+    expect_identical(registered, own)
+    expect_identical(environment(own), baseenv())
+    # No loop in the method: R caches the compiled form of a loop in the
+    # syntax tree once the function has run, and the copies would stop being
+    # identical as soon as one of them had printed something.
+    expect_false(any(grepl("\\b(for|while|repeat)\\b", deparse(body(own)))))
+  }
   x <- draws_new(data.frame(location_id = 1L), matrix(1, 1, 2), measure = "m")
   out <- utils::capture.output(eval(call("print", x), envir = globalenv()))
   expect_match(out[1], "<demolite_draws> m", fixed = TRUE)

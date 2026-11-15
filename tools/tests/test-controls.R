@@ -241,3 +241,39 @@ test_that("the sync tool copies the shared files and detects any divergence", {
   expect_identical(orphan$status, 1L)
   expect_match(orphan$out, "copy without a source", fixed = TRUE)
 })
+
+test_that("the sync tool writes the public wrappers with the prefix of each package", {
+  d <- new_dir()
+  dir.create(file.path(d, "standalone", "tests"), recursive = TRUE)
+  writeLines("shared <- function() 1", file.path(d, "standalone", "standalone-x.R"))
+  writeLines("# test", file.path(d, "standalone", "tests", "test-standalone-x.R"))
+  writeLines(c("#' @export", "PKGPREFIX_shared <- function() shared()"),
+             file.path(d, "standalone", "prefixed-w.R"))
+  for (p in c("one", "two")) {
+    write_pkg(d, name = p, r_code = "f <- function(x, y) x + y", rd = good_rd)
+  }
+  cat("\n.demolite_prefix <- \"aaa\"\n", file = file.path(d, "one", "R", "f.R"),
+      append = TRUE)
+  cat("\n.demolite_prefix <- \"bbb\"\n", file = file.path(d, "two", "R", "f.R"),
+      append = TRUE)
+  res <- run_tool("sync-standalone.R", paste0("--root=", d))
+  expect_identical(res$status, 0L)
+  expect_match(res$out, "2 prefixed file(s) compared, 2 as generated", fixed = TRUE)
+  expect_match(readLines(file.path(d, "one", "R", "import-prefixed-w.R"))[2],
+               "aaa_shared", fixed = TRUE)
+  expect_match(readLines(file.path(d, "two", "R", "import-prefixed-w.R"))[2],
+               "bbb_shared", fixed = TRUE)
+  expect_identical(run_tool("sync-standalone.R", paste0("--root=", d), "--check")$status, 0L)
+  # a wrapper edited by hand
+  cat("# edited by hand\n", file = file.path(d, "two", "R", "import-prefixed-w.R"),
+      append = TRUE)
+  edited <- run_tool("sync-standalone.R", paste0("--root=", d), "--check")
+  expect_identical(edited$status, 1L)
+  expect_match(edited$out, "two/R/import-prefixed-w.R", fixed = TRUE)
+  # a package that does not declare its prefix
+  expect_identical(run_tool("sync-standalone.R", paste0("--root=", d))$status, 0L)
+  writeLines("f <- function(x, y) x + y", file.path(d, "two", "R", "f.R"))
+  no_prefix <- run_tool("sync-standalone.R", paste0("--root=", d), "--check")
+  expect_identical(no_prefix$status, 1L)
+  expect_match(no_prefix$out, "no function prefix", fixed = TRUE)
+})

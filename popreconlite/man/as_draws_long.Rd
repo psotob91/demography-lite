@@ -19,6 +19,10 @@ Returns one row per cell and draw. This is a conversion for exchange and
 inspection, not a working format: a long table multiplies memory by the
 number of draws.
 }
+\details{
+Shared infrastructure, not exported: every package of the family exports a
+thin wrapper of it under its own prefix, \verb{<prefix>_draws_long()}.
+}
 \section{GBD equivalent}{
 
 \strong{Own.} Long tables with a \code{draw} column are a common exchange layout; the
@@ -30,12 +34,6 @@ GBD study itself publishes wide tables (see \code{\link[=as_draws_wide]{as_draws
 No estimation is involved; the matrix is unrolled column by column.
 }
 
-\examples{
-index <- data.frame(location_id = c(1, 2), sex_id = c(1, 1))
-x <- draws_new(index, matrix(1:6 / 10, nrow = 2), measure = "completeness")
-as_draws_long(x)
-
-}
 \seealso{
 Other draws:
 \code{\link[=as_draws_wide]{as_draws_wide()}},
@@ -43,6 +41,12 @@ Other draws:
 \code{\link[=draws_generate]{draws_generate()}},
 \code{\link[=draws_new]{draws_new()}},
 \code{\link[=draws_summarise]{draws_summarise()}},
+\code{\link[=prl_draws_generate]{prl_draws_generate()}},
+\code{\link[=prl_draws_long]{prl_draws_long()}},
+\code{\link[=prl_draws_new]{prl_draws_new()}},
+\code{\link[=prl_draws_wide]{prl_draws_wide()}},
+\code{\link[=prl_summarise]{prl_summarise()}},
 \code{\link[=with_cell_seed]{with_cell_seed()}}
 }
 \concept{draws}
+\keyword{internal}

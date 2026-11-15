@@ -7,7 +7,7 @@
 prl_rake(areas, national)
 }
 \arguments{
-\item{areas}{A \code{demolite_draws} container (see \code{\link[=draws_new]{draws_new()}}) with the
+\item{areas}{A \code{demolite_draws} container (see \code{\link[=prl_draws_new]{prl_draws_new()}}) with the
 population of each area by year, sex and age (persons).}
 
 \item{national}{A \code{demolite_draws} container with the national population
@@ -47,10 +47,10 @@ implemented.
 }
 
 \examples{
-areas <- draws_new(data.frame(location_id = 2:3, year_id = 2005L),
+areas <- prl_draws_new(data.frame(location_id = 2:3, year_id = 2005L),
                    matrix(c(100, 210, 104, 205), nrow = 2),
                    measure = "population", unit = "persons")
-national <- draws_new(data.frame(location_id = 1L, year_id = 2005L),
+national <- prl_draws_new(data.frame(location_id = 1L, year_id = 2005L),
                       matrix(c(318, 300), nrow = 1),
                       measure = "population", unit = "persons")
 # Skeleton: valid inputs reach the "not implemented" condition.

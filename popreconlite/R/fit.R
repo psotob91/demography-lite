@@ -87,7 +87,7 @@ prl_spec <- function(estimate = c("base_population", "migration"),
 #' Series A*, 178, 977-1007. \doi{10.1111/rssa.12104}
 #'
 #' @examples
-#' sim <- simulate_country(seed = 1, n_areas = 1, stochastic = FALSE)
+#' sim <- prl_country(seed = 1, n_areas = 1, stochastic = FALSE)
 #' # Skeleton: `spec` objects cannot be created yet, so the call stops at
 #' # input validation.
 #' tryCatch(

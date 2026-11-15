@@ -7,7 +7,7 @@
 ddl_area_mismatch(areas, national)
 }
 \arguments{
-\item{areas}{A \code{demolite_draws} container (see \code{\link[=draws_new]{draws_new()}}) with the
+\item{areas}{A \code{demolite_draws} container (see \code{\link[=ddl_draws_new]{ddl_draws_new()}}) with the
 estimated deaths of each area (registered deaths divided by completeness,
 count), one row per area and stratum.}
 
@@ -44,10 +44,10 @@ with \eqn{\hat{D}_{j,k}} the estimated deaths of area \eqn{j} in draw
 }
 
 \examples{
-areas <- draws_new(data.frame(location_id = 2:3, sex_id = 1L),
+areas <- ddl_draws_new(data.frame(location_id = 2:3, sex_id = 1L),
                    matrix(c(100, 210, 104, 205), nrow = 2),
                    measure = "deaths", unit = "count")
-national <- draws_new(data.frame(location_id = 1L, sex_id = 1L),
+national <- ddl_draws_new(data.frame(location_id = 1L, sex_id = 1L),
                       matrix(c(318, 300), nrow = 1),
                       measure = "deaths", unit = "count")
 # Skeleton: valid inputs reach the "not implemented" condition.

@@ -1,7 +1,7 @@
 # ---
 # repo: demography-lite
 # file: standalone-age-groups.R
-# last-updated: 2026-11-13
+# last-updated: 2026-11-14
 # license: MIT (see the LICENSE file at the repository root)
 # imports: data.table
 # dependencies: standalone-checks.R
@@ -13,12 +13,18 @@
 # run `Rscript tools/sync-standalone.R`.
 #
 # Contents: tables of age groups identified by exact start and end ages.
+#
+# Not exported: each package of the family exports a thin wrapper under its own
+# prefix (see standalone/prefixed-shared.R).
 
 #' Tables of age groups
 #'
 #' Returns a table of age groups in which every group is identified by its
 #' exact start and end in years. Across the family, age is always matched on
 #' `age_start` and `age_end`, never on a label.
+#'
+#' Shared infrastructure, not exported: every package of the family exports a
+#' thin wrapper of it under its own prefix, `<prefix>_age_groups()`.
 #'
 #' @param scheme String. One of
 #'   * `"gbd_u5"`: the six groups under 5 years used by the Global Burden of
@@ -57,12 +63,8 @@
 #' territories. *The Lancet*, 406, 1731-1810.
 #' \doi{10.1016/S0140-6736(25)01330-3}
 #'
-#' @examples
-#' head(age_groups("gbd_u5"), 8)
-#' age_groups("five_year", open_age = 85)
-#'
 #' @family age groups
-#' @export
+#' @keywords internal
 age_groups <- function(scheme = c("gbd_u5", "single", "five_year", "abridged"),
                        open_age = 95) {
   scheme <- .check_choice(scheme, "scheme",

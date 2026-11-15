@@ -46,7 +46,7 @@ registered deaths and \eqn{t} the length of the interval in years.
 }
 
 \examples{
-sim <- simulate_country(seed = 1, n_areas = 1, monthly = TRUE)
+sim <- ddl_country(seed = 1, n_areas = 1, monthly = TRUE)
 deaths <- sim$deaths
 deaths$deaths <- deaths$deaths_registered
 # Skeleton: `interval` objects cannot be created yet, so the call stops at

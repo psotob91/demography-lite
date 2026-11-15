@@ -1,7 +1,7 @@
 # ---
 # repo: demography-lite
 # file: standalone-draws.R
-# last-updated: 2026-11-13
+# last-updated: 2026-11-14
 # license: MIT (see the LICENSE file at the repository root)
 # imports: [data.table, stats]
 # dependencies: standalone-checks.R
@@ -13,7 +13,12 @@
 # `Rscript tools/sync-standalone.R`.
 #
 # Contents: the draws container shared by the family (a table of cells plus a
-# cells x draws matrix), its conversions, its summary, and the per-cell seed.
+# cells x draws matrix), its conversions, its summary, and the random state of
+# a cell.
+#
+# None of these functions is exported. Each package of the family exports thin
+# wrappers under its own prefix (see standalone/prefixed-shared.R), so that
+# attaching two packages of the family masks nothing.
 
 # Version of the shared data contract written into every container.
 .dl_contract_version <- "0.1.0"
@@ -31,6 +36,9 @@
 #' per cell and one column per draw. Draw `k` is the same simulated "world" in
 #' every container that descends from the same inputs, so containers must never
 #' be shuffled or re-ordered along the draw dimension.
+#'
+#' Shared infrastructure, not exported: every package of the family exports a
+#' thin wrapper of it under its own prefix, `<prefix>_draws_new()`.
 #'
 #' @param index Data frame or data.table. Either the table of cells (one row
 #'   per cell, no duplicated rows), or, when `value` is `NULL`, a complete
@@ -69,18 +77,8 @@
 #' cells, identifiers stored as integers, and age identified by exact
 #' `age_start` and `age_end`.
 #'
-#' @examples
-#' index <- data.frame(location_id = c(1, 2), sex_id = c(1, 1))
-#' value <- matrix(c(0.80, 0.90, 0.82, 0.88, 0.78, 0.91), nrow = 2)
-#' x <- draws_new(index, value, measure = "completeness", unit = "proportion")
-#' x
-#'
-#' # The same container from a long table
-#' long <- as_draws_long(x)
-#' identical(draws_new(long, measure = "completeness")$value, x$value)
-#'
 #' @family draws
-#' @export
+#' @keywords internal
 draws_new <- function(index, value = NULL, measure, unit = NA_character_,
                       seed = NA_integer_, stream = NA_character_) {
   if (missing(measure)) {
@@ -244,11 +242,13 @@ draws_new <- function(index, value = NULL, measure, unit = NA_character_,
 #' @param x A `demolite_draws` object.
 #' @param ... Ignored.
 #'
-#' Not registered through `NAMESPACE`: see `.dl_register_print()`.
+#' Registered through `NAMESPACE` by every package of the family, never
+#' exported as a function; see the comment after the function for why its
+#' enclosing environment is replaced.
 #'
 #' @return `x`, invisibly.
 #' @noRd
-#' @exportS3Method NULL
+#' @exportS3Method
 print.demolite_draws <- function(x, ...) {
   cat("<demolite_draws> ", x$meta$measure,
       if (!is.na(x$meta$unit)) paste0(" [", x$meta$unit, "]"), "\n", sep = "")
@@ -259,35 +259,28 @@ print.demolite_draws <- function(x, ...) {
   invisible(x)
 }
 
-#' Register the print methods of the shared classes, once per session
-#'
-#' The three packages of the family carry identical copies of the print
-#' methods. Each package calls this function from `.onLoad()`; the first one
-#' loaded registers the methods and the others find them already registered,
-#' so that loading two packages does not overwrite anything.
-#'
-#' @return `NULL`, invisibly.
-#' @noRd
-.dl_register_print <- function() {
-  host <- parent.env(environment())
-  # The registry of S3 methods of the generic, not the functions visible from
-  # here: the copy of this very package is always visible and proves nothing.
-  registry <- get(".__S3MethodsTable__.", envir = baseenv())
-  for (cls in c("demolite_draws", "demolite_country")) {
-    name <- paste0("print.", cls)
-    if (!exists(name, envir = registry, inherits = FALSE) &&
-          exists(name, envir = host, inherits = FALSE)) {
-      registerS3method("print", cls, get(name, envir = host), envir = baseenv())
-    }
-  }
-  invisible(NULL)
-}
+# Why the enclosing environment of the method is replaced: the three packages
+# of the family carry identical copies of the methods that print the shared
+# classes, and each of them registers its copy through `NAMESPACE`. When a
+# method for the same generic and class is already registered, R compares the
+# two and reports an overwrite if they differ; two copies of the same code
+# differ only in their enclosure, the namespace of their own package. With the
+# base environment as enclosure the copies are the same object, so loading the
+# three packages together registers the method once, says nothing and does not
+# depend on the order of loading. These methods call base functions only, and
+# they contain no loop: R caches the compiled form of a loop inside the syntax
+# tree the first time the function runs, so a copy that has already printed
+# something would stop being identical to a copy that has not.
+environment(print.demolite_draws) <- baseenv()
 
 #' Convert a container of draws to a long table
 #'
 #' Returns one row per cell and draw. This is a conversion for exchange and
 #' inspection, not a working format: a long table multiplies memory by the
 #' number of draws.
+#'
+#' Shared infrastructure, not exported: every package of the family exports a
+#' thin wrapper of it under its own prefix, `<prefix>_draws_long()`.
 #'
 #' @param x A `demolite_draws` object created with [draws_new()].
 #'
@@ -302,13 +295,8 @@ print.demolite_draws <- function(x, ...) {
 #' @section Method:
 #' No estimation is involved; the matrix is unrolled column by column.
 #'
-#' @examples
-#' index <- data.frame(location_id = c(1, 2), sex_id = c(1, 1))
-#' x <- draws_new(index, matrix(1:6 / 10, nrow = 2), measure = "completeness")
-#' as_draws_long(x)
-#'
 #' @family draws
-#' @export
+#' @keywords internal
 as_draws_long <- function(x) {
   .check_draws(x, "x")
   n <- nrow(x$index)
@@ -325,6 +313,9 @@ as_draws_long <- function(x) {
 #' used by the Global Burden of Disease (GBD) study: `draw_0`, ...,
 #' `draw_{K-1}`.
 #'
+#' Shared infrastructure, not exported: every package of the family exports a
+#' thin wrapper of it under its own prefix, `<prefix>_draws_wide()`.
+#'
 #' @param x A `demolite_draws` object created with [draws_new()].
 #'
 #' @return A data.table with the columns of `x$index` followed by `draw_0`,
@@ -338,13 +329,8 @@ as_draws_long <- function(x) {
 #' @section Method:
 #' No estimation is involved; the matrix is bound to the table of cells.
 #'
-#' @examples
-#' index <- data.frame(location_id = c(1, 2), sex_id = c(1, 1))
-#' x <- draws_new(index, matrix(1:6 / 10, nrow = 2), measure = "completeness")
-#' as_draws_wide(x)
-#'
 #' @family draws
-#' @export
+#' @keywords internal
 as_draws_wide <- function(x) {
   .check_draws(x, "x")
   out <- data.table::copy(x$index)
@@ -360,6 +346,9 @@ as_draws_wide <- function(x) {
 #' Reduces each cell to its mean and to two percentiles of its draws. Across
 #' the family the central estimate is the mean of the draws and the 95%
 #' uncertainty interval runs from the 2.5th to the 97.5th percentile.
+#'
+#' Shared infrastructure, not exported: every package of the family exports a
+#' thin wrapper of it under its own prefix, `<prefix>_summarise()`.
 #'
 #' @param x A `demolite_draws` object created with [draws_new()].
 #' @param probs Numeric vector of length two. Lower and upper probabilities of
@@ -388,14 +377,8 @@ as_draws_wide <- function(x) {
 #' territories. *The Lancet*, 406, 1731-1810.
 #' \doi{10.1016/S0140-6736(25)01330-3}
 #'
-#' @examples
-#' index <- data.frame(location_id = c(1, 2))
-#' value <- rbind(seq(0.70, 0.90, length.out = 41), seq(0.50, 0.60, length.out = 41))
-#' x <- draws_new(index, value, measure = "completeness", unit = "proportion")
-#' draws_summarise(x)
-#'
 #' @family draws
-#' @export
+#' @keywords internal
 draws_summarise <- function(x, probs = c(0.025, 0.975), na_rm = FALSE) {
   .check_draws(x, "x")
   .check_probs(probs)
@@ -421,25 +404,33 @@ draws_summarise <- function(x, probs = c(0.025, 0.975), na_rm = FALSE) {
   out[]
 }
 
-#' Derive the seed of a cell
+#' Derive the random state of a cell
 #'
 #' Maps the caller's seed, the name of a random stream and the key of a cell to
-#' a seed for that cell alone. Because the seed depends only on those three
-#' things, draw `k` of a cell is the same whatever the order of the cells and
-#' however the work is split across processes.
+#' a state of the L'Ecuyer-CMRG random number generator for that cell alone.
+#' Because the state is derived from the key and from nothing else, draw `k` of
+#' a cell is the same whatever the order of the cells, however the work is
+#' split across processes, and whatever cells are added later: a new year of
+#' data does not move the draws of the cells already computed.
+#'
+#' Shared infrastructure, not exported: the packages of the family use it
+#' inside `<prefix>_draws_generate()`, which is what a user calls.
 #'
 #' @param seed Whole number. The caller's seed. The packages never choose one.
 #' @param stream String. Name of the random stream, for instance
-#'   `"census_error"`. Different streams give unrelated seeds for the same
+#'   `"census_error"`. Different streams give unrelated states for the same
 #'   cell.
 #' @param key Data frame or named list of equal-length vectors identifying the
 #'   cells (one row per cell), or `NULL` for a factor common to all cells, in
-#'   which case the seed depends only on `seed` and `stream`. Column order
+#'   which case the state depends only on `seed` and `stream`. Column order
 #'   does not matter; column names and values do. Numbers are compared after
 #'   rounding to 15 significant digits.
 #'
-#' @return An integer vector with one seed per row of `key` (length one when
-#'   `key` is `NULL`), suitable for [with_cell_seed()].
+#' @return An integer matrix with one row per row of `key` (one row when `key`
+#'   is `NULL`) and six columns: the six words of the state of the
+#'   L'Ecuyer-CMRG generator, encoded as `.Random.seed` encodes them, so that a
+#'   word of \eqn{2^{31}} or more appears as a negative integer. One row is
+#'   what [with_cell_seed()] takes.
 #'
 #' @section GBD equivalent:
 #' **Own.** The published GBD methods do not describe how seeds are derived.
@@ -447,31 +438,37 @@ draws_summarise <- function(x, probs = c(0.025, 0.975), na_rm = FALSE) {
 #'
 #' @section Method:
 #' The text `seed|stream|name=value|...` (names sorted in the C locale) is
-#' hashed with the 32-bit FNV-1a function followed by the final mixing step of
-#' MurmurHash3, and the result is shifted to the range of R integers. The
-#' hash is implemented in base R arithmetic, so it gives the same seeds on
-#' every platform. Limitation: with 32 bits, two of `N` cells share a seed with
-#' probability of about \eqn{N^2 / 2^{33}}; such cells would receive identical
-#' random numbers within a stream.
+#' hashed once per word of the state, each time behind its own salt (`1#` to
+#' `6#`), with the 32-bit FNV-1a function followed by the final mixing step of
+#' MurmurHash3. The first three words are then reduced modulo
+#' \eqn{m_1 = 4294967087} and the last three modulo \eqn{m_2 = 4294944443},
+#' the moduli of the two components of the generator. A trio of zeros, which
+#' would stop its half of the generator, becomes a one in its first word; the
+#' single word \eqn{2^{31}}, which R cannot hold in an integer, becomes
+#' \eqn{2^{31} + 1}. The hash is implemented in base R arithmetic, so it gives
+#' the same state on every platform.
 #'
-#' @examples
-#' cells <- data.frame(location_id = c(1, 2, 3), sex_id = c(1, 1, 2))
-#' cell_seed(2024, "census_error", cells)
-#'
-#' # The seed of a cell does not depend on the order of the cells
-#' rev(cell_seed(2024, "census_error", cells[3:1, ]))
-#'
-#' # A factor common to all cells
-#' cell_seed(2024, "common_level")
+#' Two cells share a state only if all six words agree. Taking the words as
+#' independent and uniform, the probability that some two of \eqn{N} cells
+#' share a state is about
+#' \deqn{N (N - 1) / (2 m_1^3 m_2^3) \approx N^2 / 2^{193}}
+#' which for a grid of \eqn{N = 168000} cells (25 areas x 2 sexes x 96 ages x
+#' 35 years) is about \eqn{2 \times 10^{-48}}: a collision is not expected
+#' ever. The same formula for the single 32-bit seed used up to version
+#' 0.0.0.9000, where the space was \eqn{2^{32}}, gives 3.3 expected pairs and a
+#' probability of 96% for that grid; the cells of such a pair received
+#' identical random numbers within a stream. FNV-1a is not a cryptographic
+#' hash, so labels could be built on purpose to collide; the labels of cells
+#' are not chosen by an adversary.
 #'
 #' @family draws
-#' @export
+#' @keywords internal
 cell_seed <- function(seed, stream, key = NULL) {
   seed <- .check_seed(seed)
   .check_string(stream, "stream")
   head <- paste0(seed, "|", stream)
   if (is.null(key)) {
-    return(.dl_hash_to_seed(.dl_fmix32(.dl_fnv1a32(head))))
+    return(.dl_text_to_state(head))
   }
   if (!is.list(key) || is.null(names(key)) || !length(key) ||
         any(!nzchar(names(key))) || anyDuplicated(names(key))) {
@@ -484,7 +481,37 @@ cell_seed <- function(seed, stream, key = NULL) {
   nm <- sort(names(key), method = "radix")
   parts <- lapply(nm, function(col) paste0(col, "=", .dl_key_text(key[[col]], col)))
   text <- paste0(head, "|", do.call(paste, c(parts, sep = "|")))
-  .dl_hash_to_seed(.dl_fmix32(.dl_fnv1a32(text)))
+  .dl_text_to_state(text)
+}
+
+#' Map the label of a cell to a state of the L'Ecuyer-CMRG generator
+#'
+#' @param text Character vector. One canonical label per cell.
+#'
+#' @return An integer matrix with one row per label and six columns, encoded
+#'   as `.Random.seed` encodes the state.
+#' @noRd
+.dl_text_to_state <- function(text) {
+  m1 <- 4294967087
+  m2 <- 4294944443
+  n <- length(text)
+  state <- matrix(0, nrow = n, ncol = 6L)
+  for (j in seq_len(6L)) {
+    # One salt per word: the six words of a cell come from six hashes.
+    h <- .dl_fmix32(.dl_fnv1a32(paste0(j, "#", text)))
+    state[, j] <- h %% if (j <= 3L) m1 else m2
+  }
+  zero1 <- rowSums(state[, 1:3, drop = FALSE]) == 0
+  zero2 <- rowSums(state[, 4:6, drop = FALSE]) == 0
+  state[zero1, 1L] <- 1
+  state[zero2, 4L] <- 1
+  # R integers cannot hold 2^31; the next value is as good a word.
+  state[state == 2147483648] <- 2147483649
+  big <- state >= 2147483648
+  state[big] <- state[big] - 4294967296
+  storage.mode(state) <- "integer"
+  dimnames(state) <- NULL
+  state
 }
 
 #' Canonical text of a key column
@@ -572,26 +599,17 @@ cell_seed <- function(seed, stream, key = NULL) {
   .dl_xor32(h, h %/% 65536)
 }
 
-#' Map a 32-bit hash to a valid R seed
+#' Evaluate code with the random state of a cell, restoring the generator
 #'
-#' @param h Numeric vector of whole numbers in `[0, 2^32)`.
-#'
-#' @return Integer vector without missing values.
-#' @noRd
-.dl_hash_to_seed <- function(h) {
-  s <- h - 2147483648
-  s[s == -2147483648] <- 0
-  as.integer(s)
-}
-
-#' Evaluate code with the seed of a cell, restoring the generator afterwards
-#'
-#' Sets the random number generator to a known kind and seed, evaluates an
+#' Sets the random number generator to a known kind and state, evaluates an
 #' expression and then puts the generator back exactly as it was, so that the
 #' caller's own random stream is not disturbed.
 #'
-#' @param seed Whole number. Usually one element of [cell_seed()].
-#' @param expr Expression to evaluate with that seed.
+#' Shared infrastructure, not exported: see [cell_seed()].
+#'
+#' @param state Integer vector of length six, or a matrix with one row and six
+#'   columns: the state of a cell, usually one row of [cell_seed()].
+#' @param expr Expression to evaluate with that state.
 #'
 #' @return The value of `expr`.
 #'
@@ -601,21 +619,17 @@ cell_seed <- function(seed, stream, key = NULL) {
 #' @section Method:
 #' The state of the generator (the object `.Random.seed` of the global
 #' environment, which also encodes the kind of generator) is saved; the
-#' generator is set to Mersenne-Twister with inversion for normal deviates and
-#' rejection sampling, seeded with `seed`; `expr` is evaluated; and the saved
-#' state is restored on exit, even if `expr` fails. No fixed seed is ever
-#' used.
-#'
-#' @examples
-#' s <- cell_seed(2024, "example", data.frame(location_id = 1))
-#' a <- with_cell_seed(s, stats::rnorm(3))
-#' b <- with_cell_seed(s, stats::rnorm(3))
-#' identical(a, b)
+#' generator is set to L'Ecuyer-CMRG with inversion for normal deviates and
+#' rejection sampling, and its six words are overwritten with `state`; `expr`
+#' is evaluated; and the saved state is restored on exit, even if `expr`
+#' fails. The words are written rather than passed to [set.seed()], because
+#' [set.seed()] takes one number of 32 bits and would throw away the width of
+#' the state. No fixed seed is ever used.
 #'
 #' @family draws
-#' @export
-with_cell_seed <- function(seed, expr) {
-  seed <- .check_seed(seed)
+#' @keywords internal
+with_cell_seed <- function(state, expr) {
+  state <- .check_cell_state(state)
   genv <- globalenv()
   old_seed <- get0(".Random.seed", envir = genv, inherits = FALSE)
   old_kind <- RNGkind()
@@ -629,16 +643,21 @@ with_cell_seed <- function(seed, expr) {
       assign(".Random.seed", old_seed, envir = genv)
     }
   }, add = TRUE)
-  set.seed(seed, kind = "Mersenne-Twister", normal.kind = "Inversion",
-           sample.kind = "Rejection")
+  RNGkind("L'Ecuyer-CMRG", normal.kind = "Inversion", sample.kind = "Rejection")
+  current <- get(".Random.seed", envir = genv, inherits = FALSE)
+  current[2:7] <- state
+  assign(".Random.seed", current, envir = genv)
   expr
 }
 
 #' Generate draws cell by cell with per-cell seeds
 #'
-#' Calls a generator once per cell, each time under the seed of that cell, and
-#' collects the results in a container. Draw `k` of a cell therefore depends
-#' only on the caller's seed, the stream name and the key of the cell.
+#' Calls a generator once per cell, each time under the random state of that
+#' cell, and collects the results in a container. Draw `k` of a cell therefore
+#' depends only on the caller's seed, the stream name and the key of the cell.
+#'
+#' Shared infrastructure, not exported: every package of the family exports a
+#' thin wrapper of it under its own prefix, `<prefix>_draws_generate()`.
 #'
 #' @param index Data frame or data.table with one row per cell.
 #' @param n_draws Whole number. Number of draws per cell.
@@ -658,21 +677,13 @@ with_cell_seed <- function(seed, expr) {
 #' **Own.** See [cell_seed()].
 #'
 #' @section Method:
-#' For each cell `i`, the seed is `cell_seed(seed, stream, key_i)` and the
-#' generator runs inside [with_cell_seed()], which restores the state of the
-#' random number generator. Memory: one double per cell and draw.
-#'
-#' @examples
-#' cells <- data.frame(location_id = 1:3, sd = c(0.1, 0.2, 0.3))
-#' gen <- function(n, cell) stats::rnorm(n, mean = 0, sd = cell$sd)
-#' a <- draws_generate(cells, 5, seed = 2024, stream = "noise", gen,
-#'                     measure = "error", key_cols = "location_id")
-#' b <- draws_generate(cells[3:1, ], 5, seed = 2024, stream = "noise", gen,
-#'                     measure = "error", key_cols = "location_id")
-#' identical(a$value, b$value[3:1, ])
+#' For each cell `i`, the state is row `i` of
+#' `cell_seed(seed, stream, key_i)` and the generator runs inside
+#' [with_cell_seed()], which restores the state of the random number
+#' generator. Memory: one double per cell and draw.
 #'
 #' @family draws
-#' @export
+#' @keywords internal
 draws_generate <- function(index, n_draws, seed, stream, generator, measure,
                            unit = NA_character_, key_cols = names(index)) {
   .check_table(index, "index")
@@ -687,11 +698,11 @@ draws_generate <- function(index, n_draws, seed, stream, generator, measure,
     .dl_abort("`key_cols` must name one or more columns of `index`.")
   }
   index <- .dl_index_clean(index)
-  seeds <- cell_seed(seed, stream, as.list(index)[key_cols])
+  states <- cell_seed(seed, stream, as.list(index)[key_cols])
   value <- matrix(NA_real_, nrow = nrow(index), ncol = n_draws)
   for (i in seq_len(nrow(index))) {
     cell <- as.list(index[i, ])
-    v <- with_cell_seed(seeds[i], generator(n_draws, cell))
+    v <- with_cell_seed(states[i, ], generator(n_draws, cell))
     if (!is.numeric(v) || length(v) != n_draws) {
       .dl_abort(c("`generator` must return ", n_draws, " numbers per cell; ",
                   "for row ", i, " it returned ", length(v), " value(s) of ",

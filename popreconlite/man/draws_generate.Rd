@@ -39,9 +39,13 @@ A \code{demolite_draws} object (see \code{\link[=draws_new]{draws_new()}}) with 
 and the cells of \code{index} in the same order.
 }
 \description{
-Calls a generator once per cell, each time under the seed of that cell, and
-collects the results in a container. Draw \code{k} of a cell therefore depends
-only on the caller's seed, the stream name and the key of the cell.
+Calls a generator once per cell, each time under the random state of that
+cell, and collects the results in a container. Draw \code{k} of a cell therefore
+depends only on the caller's seed, the stream name and the key of the cell.
+}
+\details{
+Shared infrastructure, not exported: every package of the family exports a
+thin wrapper of it under its own prefix, \verb{<prefix>_draws_generate()}.
 }
 \section{GBD equivalent}{
 
@@ -50,21 +54,12 @@ only on the caller's seed, the stream name and the key of the cell.
 
 \section{Method}{
 
-For each cell \code{i}, the seed is \code{cell_seed(seed, stream, key_i)} and the
-generator runs inside \code{\link[=with_cell_seed]{with_cell_seed()}}, which restores the state of the
-random number generator. Memory: one double per cell and draw.
+For each cell \code{i}, the state is row \code{i} of
+\code{cell_seed(seed, stream, key_i)} and the generator runs inside
+\code{\link[=with_cell_seed]{with_cell_seed()}}, which restores the state of the random number
+generator. Memory: one double per cell and draw.
 }
 
-\examples{
-cells <- data.frame(location_id = 1:3, sd = c(0.1, 0.2, 0.3))
-gen <- function(n, cell) stats::rnorm(n, mean = 0, sd = cell$sd)
-a <- draws_generate(cells, 5, seed = 2024, stream = "noise", gen,
-                    measure = "error", key_cols = "location_id")
-b <- draws_generate(cells[3:1, ], 5, seed = 2024, stream = "noise", gen,
-                    measure = "error", key_cols = "location_id")
-identical(a$value, b$value[3:1, ])
-
-}
 \seealso{
 Other draws:
 \code{\link[=as_draws_long]{as_draws_long()}},
@@ -72,6 +67,12 @@ Other draws:
 \code{\link[=cell_seed]{cell_seed()}},
 \code{\link[=draws_new]{draws_new()}},
 \code{\link[=draws_summarise]{draws_summarise()}},
+\code{\link[=prl_draws_generate]{prl_draws_generate()}},
+\code{\link[=prl_draws_long]{prl_draws_long()}},
+\code{\link[=prl_draws_new]{prl_draws_new()}},
+\code{\link[=prl_draws_wide]{prl_draws_wide()}},
+\code{\link[=prl_summarise]{prl_summarise()}},
 \code{\link[=with_cell_seed]{with_cell_seed()}}
 }
 \concept{draws}
+\keyword{internal}

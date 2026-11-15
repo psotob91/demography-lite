@@ -224,7 +224,7 @@ ddl_ggbseg <- function(pop1, pop2, deaths, interval, net_migrants = NULL,
 #' complete at old ages; ages reported without systematic error.
 #'
 #' @examples
-#' sim <- simulate_country(seed = 1, n_areas = 1, stochastic = FALSE)
+#' sim <- ddl_country(seed = 1, n_areas = 1, stochastic = FALSE)
 #' one <- sim$intercensal[sim$intercensal$location_id == 2 &
 #'                          sim$intercensal$sex_id == 1, ]
 #' cen <- sim$census[sim$census$location_id == 2 & sim$census$sex_id == 1, ]

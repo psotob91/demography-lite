@@ -36,7 +36,7 @@ method; if \code{TRUE}, deaths are random counts.}
 vectors. With the default single area, locations 1 (national) and 2 (the
 area) are identical.}
 
-\item{...}{Other arguments passed to \code{\link[=simulate_country]{simulate_country()}}, for instance
+\item{...}{Other arguments passed to \code{\link[=ddl_country]{ddl_country()}}, for instance
 \code{n_areas} or \code{census_dates}.}
 }
 \value{
@@ -55,27 +55,27 @@ sex (\code{location_id}, \code{sex_id}, \code{age_start}, \code{age_end}, \code{
 \code{deaths}, \code{net_migrants}), the layout that \code{\link[=ddl_estimate]{ddl_estimate()}} takes;
 \item \code{truth}: a list with the planted \code{completeness}, \code{census_coverage} and
 \code{net_rate};
-\item \code{country}: the full output of \code{\link[=simulate_country]{simulate_country()}}.
+\item \code{country}: the full output of \code{\link[=ddl_country]{ddl_country()}}.
 }
 }
 \description{
-Runs \code{\link[=simulate_country]{simulate_country()}} and arranges its output as the inputs of the
+Runs \code{\link[=ddl_country]{ddl_country()}} and arranges its output as the inputs of the
 death distribution methods: two censuses, mean annual registered deaths and
 mean annual net migrants by five-year age group, with the completeness that
 was planted.
 }
 \details{
-\strong{Status: implemented} as a thin wrapper of \code{\link[=simulate_country]{simulate_country()}}.
+\strong{Status: implemented} as a thin wrapper of \code{\link[=ddl_country]{ddl_country()}}.
 }
 \section{GBD equivalent}{
 
-\strong{Own.} See \code{\link[=simulate_country]{simulate_country()}}.
+\strong{Own.} See \code{\link[=ddl_country]{ddl_country()}}.
 }
 
 \section{Method}{
 
 The country is simulated by cohort-component accounting (see
-\code{\link[=simulate_country]{simulate_country()}}), which is a different rule from the one used by the
+\code{\link[=ddl_country]{ddl_country()}}), which is a different rule from the one used by the
 methods under test. Single years of age are added up to five-year groups;
 deaths and migrants of the intercensal period are divided by its length.
 }
@@ -88,6 +88,7 @@ sim$truth$completeness
 }
 \seealso{
 Other simulation:
+\code{\link[=ddl_country]{ddl_country()}},
 \code{\link[=simulate_country]{simulate_country()}}
 }
 \concept{simulation}

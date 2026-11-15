@@ -2,22 +2,26 @@
 % Please edit documentation in R/import-standalone-draws.R
 \name{with_cell_seed}
 \alias{with_cell_seed}
-\title{Evaluate code with the seed of a cell, restoring the generator afterwards}
+\title{Evaluate code with the random state of a cell, restoring the generator}
 \usage{
-with_cell_seed(seed, expr)
+with_cell_seed(state, expr)
 }
 \arguments{
-\item{seed}{Whole number. Usually one element of \code{\link[=cell_seed]{cell_seed()}}.}
+\item{state}{Integer vector of length six, or a matrix with one row and six
+columns: the state of a cell, usually one row of \code{\link[=cell_seed]{cell_seed()}}.}
 
-\item{expr}{Expression to evaluate with that seed.}
+\item{expr}{Expression to evaluate with that state.}
 }
 \value{
 The value of \code{expr}.
 }
 \description{
-Sets the random number generator to a known kind and seed, evaluates an
+Sets the random number generator to a known kind and state, evaluates an
 expression and then puts the generator back exactly as it was, so that the
 caller's own random stream is not disturbed.
+}
+\details{
+Shared infrastructure, not exported: see \code{\link[=cell_seed]{cell_seed()}}.
 }
 \section{GBD equivalent}{
 
@@ -28,19 +32,14 @@ caller's own random stream is not disturbed.
 
 The state of the generator (the object \code{.Random.seed} of the global
 environment, which also encodes the kind of generator) is saved; the
-generator is set to Mersenne-Twister with inversion for normal deviates and
-rejection sampling, seeded with \code{seed}; \code{expr} is evaluated; and the saved
-state is restored on exit, even if \code{expr} fails. No fixed seed is ever
-used.
+generator is set to L'Ecuyer-CMRG with inversion for normal deviates and
+rejection sampling, and its six words are overwritten with \code{state}; \code{expr}
+is evaluated; and the saved state is restored on exit, even if \code{expr}
+fails. The words are written rather than passed to \code{\link[=set.seed]{set.seed()}}, because
+\code{\link[=set.seed]{set.seed()}} takes one number of 32 bits and would throw away the width of
+the state. No fixed seed is ever used.
 }
 
-\examples{
-s <- cell_seed(2024, "example", data.frame(location_id = 1))
-a <- with_cell_seed(s, stats::rnorm(3))
-b <- with_cell_seed(s, stats::rnorm(3))
-identical(a, b)
-
-}
 \seealso{
 Other draws:
 \code{\link[=as_draws_long]{as_draws_long()}},
@@ -48,6 +47,12 @@ Other draws:
 \code{\link[=cell_seed]{cell_seed()}},
 \code{\link[=draws_generate]{draws_generate()}},
 \code{\link[=draws_new]{draws_new()}},
-\code{\link[=draws_summarise]{draws_summarise()}}
+\code{\link[=draws_summarise]{draws_summarise()}},
+\code{\link[=evl_draws_generate]{evl_draws_generate()}},
+\code{\link[=evl_draws_long]{evl_draws_long()}},
+\code{\link[=evl_draws_new]{evl_draws_new()}},
+\code{\link[=evl_draws_wide]{evl_draws_wide()}},
+\code{\link[=evl_summarise]{evl_summarise()}}
 }
 \concept{draws}
+\keyword{internal}

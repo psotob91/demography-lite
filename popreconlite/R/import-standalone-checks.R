@@ -1,7 +1,7 @@
 # ---
 # repo: demography-lite
 # file: standalone-checks.R
-# last-updated: 2026-11-13
+# last-updated: 2026-11-14
 # license: MIT (see the LICENSE file at the repository root)
 # imports: none (base R only)
 # ---
@@ -63,6 +63,30 @@
       "provides its interface, documentation and input validation."),
     class = "not_implemented"
   )
+}
+
+#' Signal a classed warning
+#'
+#' @param message Character vector. Pasted together to form the message.
+#' @param class String. Suffix of the condition class.
+#'
+#' @return `NULL`, invisibly; signals a condition with classes
+#'   `<prefix>_warning_<class>`, `<prefix>_warning`,
+#'   `demolite_warning_<class>`, `demolite_warning`, `warning` and
+#'   `condition`.
+#' @noRd
+.dl_warn <- function(message, class) {
+  prefix <- .dl_prefix()
+  classes <- unique(c(
+    paste0(prefix, "_warning_", class), paste0(prefix, "_warning"),
+    paste0("demolite_warning_", class), "demolite_warning", "warning",
+    "condition"
+  ))
+  warning(structure(
+    class = classes,
+    list(message = paste(message, collapse = ""), call = NULL)
+  ))
+  invisible(NULL)
 }
 
 #' Check a single number
@@ -253,6 +277,36 @@
                 "caller; the packages never choose a seed."))
   }
   invisible(as.integer(seed))
+}
+
+#' Check the random state of a cell and return its six words
+#'
+#' @param state Object to check. The six words of the state of the
+#'   L'Ecuyer-CMRG generator, as [cell_seed()] returns them: a length-six
+#'   vector of whole numbers, or a matrix with one row and six columns.
+#' @param arg String. Argument name used in the message.
+#'
+#' @return `state` as an integer vector of length six, invisibly.
+#' @noRd
+.check_cell_state <- function(state, arg = "state") {
+  if (is.matrix(state) && nrow(state) == 1L) {
+    state <- as.vector(state)
+  }
+  ok <- is.numeric(state) && length(state) == 6L && !anyNA(state) &&
+    all(state == trunc(state)) && all(abs(state) <= 2147483647)
+  if (ok) {
+    # `.Random.seed` stores the six unsigned words as signed integers.
+    u <- ifelse(state < 0, state + 4294967296, state)
+    ok <- all(u[1:3] < 4294967087) && all(u[4:6] < 4294944443) &&
+      sum(u[1:3]) > 0 && sum(u[4:6]) > 0
+  }
+  if (!ok) {
+    .dl_abort(c("`", arg, "` must be the six words of the state of a cell, ",
+                "as `cell_seed()` returns them: the first three below ",
+                "4294967087, the last three below 4294944443, neither trio ",
+                "all zero."))
+  }
+  invisible(as.integer(state))
 }
 
 #' Check a pair of probabilities for an interval

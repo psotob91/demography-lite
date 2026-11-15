@@ -8,7 +8,7 @@
 #' its inputs and then signals a condition of class
 #' `evl_error_not_implemented`.
 #'
-#' @param children A `demolite_draws` container (see [draws_new()]) with an
+#' @param children A `demolite_draws` container (see [evl_draws_new()]) with an
 #'   additive measure (for instance `"deaths"`, count) for the areas, one row
 #'   per area and stratum.
 #' @param parent A `demolite_draws` container with the same measure for the
@@ -38,10 +38,10 @@
 #' Mathematical Statistics*, 11, 427-444. \doi{10.1214/aoms/1177731829}
 #'
 #' @examples
-#' children <- draws_new(data.frame(location_id = 2:3, sex_id = 1L),
+#' children <- evl_draws_new(data.frame(location_id = 2:3, sex_id = 1L),
 #'                       matrix(c(100, 210, 104, 205), nrow = 2),
 #'                       measure = "deaths", unit = "count")
-#' parent <- draws_new(data.frame(location_id = 1L, sex_id = 1L),
+#' parent <- evl_draws_new(data.frame(location_id = 1L, sex_id = 1L),
 #'                     matrix(c(318, 300), nrow = 1),
 #'                     measure = "deaths", unit = "count")
 #' # Skeleton: valid inputs reach the "not implemented" condition.
@@ -82,10 +82,10 @@ evl_rake <- function(children, parent) {
 #' with the notation of [evl_rake()].
 #'
 #' @examples
-#' children <- draws_new(data.frame(location_id = 2:3, sex_id = 1L),
+#' children <- evl_draws_new(data.frame(location_id = 2:3, sex_id = 1L),
 #'                       matrix(c(100, 210, 104, 205), nrow = 2),
 #'                       measure = "deaths", unit = "count")
-#' parent <- draws_new(data.frame(location_id = 1L, sex_id = 1L),
+#' parent <- evl_draws_new(data.frame(location_id = 1L, sex_id = 1L),
 #'                     matrix(c(318, 300), nrow = 1),
 #'                     measure = "deaths", unit = "count")
 #' # Skeleton: valid inputs reach the "not implemented" condition.

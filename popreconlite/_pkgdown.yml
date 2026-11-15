@@ -4,19 +4,32 @@ template:
 reference:
 - title: Population reconstruction
   contents:
-  - starts_with('prl_')
+  - prl_spec
+  - prl_fit
+  - prl_project
+  - prl_draw
+  - prl_holdout
+  - prl_rake
+  - prl_interval
+  - prl_births
+  - prl_deaths_by_cohort
+  - prl_graduate
+  - prl_rogers_castro
+  - prl_fit_rogers_castro
+  - prl_check_linearisation
 - title: Simulated data with planted truth
   contents:
-  - simulate_country
-- title: Draws and per-cell seeds
+  - prl_country
+- title: Draws
   contents:
-  - draws_new
-  - as_draws_long
-  - as_draws_wide
-  - draws_summarise
-  - draws_generate
-  - cell_seed
-  - with_cell_seed
+  - prl_draws_new
+  - prl_draws_long
+  - prl_draws_wide
+  - prl_summarise
+  - prl_draws_generate
 - title: Age groups
   contents:
-  - age_groups
+  - prl_age_groups
+- title: Shared infrastructure of the family (internal, not exported)
+  contents:
+  - has_keyword("internal")

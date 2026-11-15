@@ -55,7 +55,7 @@ is implemented.
 }
 
 \examples{
-sim <- simulate_country(seed = 1, n_areas = 1, stochastic = FALSE)
+sim <- prl_country(seed = 1, n_areas = 1, stochastic = FALSE)
 base <- sim$census[sim$census$location_id == 2 & sim$census$census_id == 1, ]
 # Skeleton: valid inputs reach the "not implemented" condition.
 tryCatch(

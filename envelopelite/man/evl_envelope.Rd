@@ -10,10 +10,10 @@ evl_envelope(registered, completeness)
 \item{registered}{Data frame or data.table with one row per cell:
 \code{location_id}, \code{year_id}, \code{sex_id}, \code{age_start}, \code{age_end} and \code{deaths}
 (registered deaths, count). Ages under 5 use the six groups of
-\code{age_groups("gbd_u5")}, so that the envelope keeps the four groups under
+\code{evl_age_groups("gbd_u5")}, so that the envelope keeps the four groups under
 1 year.}
 
-\item{completeness}{A \code{demolite_draws} container (see \code{\link[=draws_new]{draws_new()}}) with
+\item{completeness}{A \code{demolite_draws} container (see \code{\link[=evl_draws_new]{evl_draws_new()}}) with
 the measure \code{"completeness"} (proportion) by location, year, sex and age
 band.}
 }
@@ -51,8 +51,8 @@ age groups of deaths will be documented when the function is implemented.
 }
 
 \examples{
-sim <- simulate_country(seed = 1, n_areas = 1)
-completeness <- draws_new(
+sim <- evl_country(seed = 1, n_areas = 1)
+completeness <- evl_draws_new(
   data.frame(location_id = 1:2),
   matrix(c(0.80, 0.80, 0.82, 0.82), nrow = 2),
   measure = "completeness", unit = "proportion"
@@ -69,7 +69,6 @@ tryCatch(
 \seealso{
 Other envelope:
 \code{\link{envelopelite-contract}},
-\code{\link[=evl_mx]{evl_mx()}},
-\code{\link[=evl_summarise]{evl_summarise()}}
+\code{\link[=evl_mx]{evl_mx()}}
 }
 \concept{envelope}

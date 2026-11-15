@@ -1,7 +1,7 @@
 # ---
 # repo: demography-lite
 # file: standalone-simulate-country.R
-# last-updated: 2026-11-13
+# last-updated: 2026-11-14
 # license: MIT (see the LICENSE file at the repository root)
 # imports: [data.table, stats]
 # dependencies: [standalone-checks.R, standalone-draws.R, standalone-age-groups.R]
@@ -15,6 +15,9 @@
 # Contents: a small, fully invented country with planted truth. Nothing in
 # this file comes from real data: every rate is an analytic function with
 # made-up parameters.
+#
+# `simulate_country()` is not exported: each package of the family exports a
+# thin wrapper under its own prefix (see standalone/prefixed-shared.R).
 
 #' Simulate a small country with planted truth
 #'
@@ -24,6 +27,9 @@
 #' completeness planted in each area, and the deaths that end up registered.
 #' Because the truth is known, the output is the test bed for every method of
 #' the family. No number, name or structure is taken from any real country.
+#'
+#' Shared infrastructure, not exported: every package of the family exports a
+#' thin wrapper of it under its own prefix, `<prefix>_country()`.
 #'
 #' @param seed Whole number. The caller's seed; it drives the planted
 #'   parameters that are left as `NULL` and the random counts. The function
@@ -135,18 +141,8 @@
 #' Rogers A, Castro LJ (1981). *Model Migration Schedules*. Research Report
 #' RR-81-30. Laxenburg: International Institute for Applied Systems Analysis.
 #'
-#' @examples
-#' sim <- simulate_country(seed = 2024, n_areas = 2)
-#' sim
-#'
-#' # Aggregating recovers the planted completeness (ages 5 and over)
-#' d <- sim$deaths[sim$deaths$age_start >= 5, ]
-#' observed <- tapply(d$deaths_registered, d$location_id, sum) /
-#'   tapply(d$deaths_true, d$location_id, sum)
-#' cbind(sim$truth$completeness, observed = as.numeric(observed))
-#'
 #' @family simulation
-#' @export
+#' @keywords internal
 simulate_country <- function(seed, n_areas = 3, census_dates = c(2000.5, 2010.5),
                              births_per_year = NULL, completeness = NULL,
                              completeness_range = c(0.6, 0.95),
@@ -324,7 +320,7 @@ simulate_country <- function(seed, n_areas = 3, census_dates = c(2000.5, 2010.5)
 #'
 #' @return `x`, invisibly.
 #' @noRd
-#' @exportS3Method NULL
+#' @exportS3Method
 print.demolite_country <- function(x, ...) {
   tables <- c("locations", "census", "population", "births", "deaths",
               "migration", "intercensal")
@@ -333,13 +329,20 @@ print.demolite_country <- function(x, ...) {
       format(x$meta$census_dates[2L]), "; seed ", x$meta$seed,
       if (x$meta$stochastic) "; random counts" else "; expected values", "\n",
       sep = "")
-  for (name in tables) {
-    cat("  $", format(name, width = 12), nrow(x[[name]]), " rows\n", sep = "")
-  }
+  rows <- unlist(lapply(x[tables], nrow), use.names = FALSE)
+  cat(paste0("  $", format(tables, width = 12), rows, " rows\n"), sep = "")
   cat("  $truth       planted completeness, mortality level, migration, ",
       "coverage\n", sep = "")
   invisible(x)
 }
+
+# One and the same object in the three packages: see the comment next to
+# `print.demolite_draws()` in standalone-draws.R. The method must also stay
+# free of `for`, `while` and `repeat`: R caches the compiled form of a loop
+# inside the syntax tree the first time the function runs, which would make a
+# copy that has already printed something differ from one that has not, and R
+# would then report an overwrite when the second package registers its copy.
+environment(print.demolite_country) <- baseenv()
 
 #' Resolve a per-area parameter of the simulator
 #'
@@ -374,8 +377,10 @@ print.demolite_country <- function(x, ...) {
 #'   only on the seed, the stream and its identifier.
 #' @noRd
 .dl_sim_draw <- function(seed, stream, area_id, lower, upper) {
-  seeds <- cell_seed(seed, stream, list(location_id = area_id))
-  vapply(seeds, function(s) with_cell_seed(s, stats::runif(1L, lower, upper)), 0)
+  states <- cell_seed(seed, stream, list(location_id = area_id))
+  vapply(seq_len(nrow(states)),
+         function(i) with_cell_seed(states[i, ], stats::runif(1L, lower, upper)),
+         0)
 }
 
 #' Cumulative hazard of the invented standard mortality schedule

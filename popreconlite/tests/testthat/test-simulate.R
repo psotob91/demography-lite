@@ -1,7 +1,7 @@
-test_that("prl_simulate returns the simulated country of the family", {
+test_that("prl_country returns the simulated country of the family", {
   expect_s3_class(sim_prl, "demolite_country")
   expect_identical(sim_prl, simulate_country(seed = 31, n_areas = 2, stochastic = FALSE))
-  expect_error(prl_simulate(), class = "prl_error_input")
+  expect_error(prl_country(), class = "prl_error_input")
 })
 
 test_that("the planted population closes by cohort components", {
@@ -26,7 +26,12 @@ test_that("the list of implemented and skeleton functions is the declared one", 
                 "prl_draw", "prl_fit", "prl_fit_rogers_castro", "prl_graduate",
                 "prl_holdout", "prl_interval", "prl_project", "prl_rake",
                 "prl_rogers_castro", "prl_spec")
-  expect_identical(own, sort(c("prl_simulate", skeleton)))
+  shared <- c("prl_age_groups", "prl_country", "prl_draws_generate",
+              "prl_draws_long", "prl_draws_new", "prl_draws_wide",
+              "prl_summarise")
+  expect_identical(own, sort(c(shared, skeleton)))
+  # the shared wrappers are thin: they call the internal function and nothing
+  # else, so none of them is a skeleton
   is_skeleton <- vapply(own, function(f) {
     any(grepl(".dl_not_implemented", deparse(body(get(f))), fixed = TRUE))
   }, logical(1))

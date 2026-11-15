@@ -12,10 +12,10 @@
 #' * `age_start`, `age_end` (numeric): exact age in years, start included and
 #'   end excluded, `Inf` for the open group. **This pair is the age key.**
 #' * `age_group_id` (integer, optional): GBD identifier where the user
-#'   supplies the map; see [age_groups()].
+#'   supplies the map; see [evl_age_groups()].
 #'
 #' @section Draws:
-#' Every product is a container created with [draws_new()]: a table of cells
+#' Every product is a container created with [evl_draws_new()]: a table of cells
 #' and a cells x draws matrix. Draw `k` is the same "world" in every product:
 #' envelope `k` comes from completeness `k`, and rate `k` from envelope `k`
 #' and population `k`. Consumers must not shuffle or re-order draws. The

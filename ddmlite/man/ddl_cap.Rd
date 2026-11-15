@@ -22,7 +22,9 @@ An object of the same shape as \code{completeness}: values at or above
 }
 \description{
 Applies the rule that sets completeness to 1 when the estimate reaches a
-threshold, 0.95 by default.
+threshold, 0.95 by default. The rule is a jump, not a ramp: nothing
+smooths the step at the threshold, and the function says so with a warning
+when some of its input falls just below it.
 }
 \details{
 \strong{Status: implemented.}
@@ -33,19 +35,39 @@ threshold, 0.95 by default.
 study, which treats vital registration with estimated completeness of 95\%
 or more as complete. The passage of the GBD 2023 demographics appendix
 that states the rule still has to be cited here before any release.
-\strong{Differs} in nothing by design; any transition applied just below the
-threshold is left to the caller.
+\strong{Differs} in nothing: only the published rule is offered. No transition
+of our own is added just below the threshold, so that what the function
+does is exactly what can be cited (decision of the repository owner, 14
+November 2026). A caller who wants a transition has to write it.
 }
 
 \section{Method}{
 
 \deqn{c^{*} = 1 \text{ if } c \ge \tau, \qquad c^{*} = c \text{ otherwise}}
-with \eqn{\tau} the threshold. The rule is discontinuous at the threshold:
-applied draw by draw, it pulls the mean of the draws towards 1.
+with \eqn{\tau} the threshold.
+
+\strong{How big the jump is.} Completeness enters the next step as a divisor of
+registered deaths, so the step in completeness is a step in the deaths that
+are estimated. With the default threshold, a cell with completeness 0.9499
+keeps it and its deaths are divided by 0.9499, that is multiplied by
+\eqn{1/0.9499 = 1.053}; a cell with 0.9501 is set to 1 and its deaths are
+left untouched. Two cells four ten-thousandths apart therefore differ by
+5.3\% in estimated deaths. The jump is the size of
+\eqn{1/\tau - 1} = 5.3\% at \eqn{\tau = 0.95}.
+
+\strong{Where the threshold decides the result.} The function signals a warning
+of class \code{ddl_warning_threshold} when some value falls in
+\eqn{[\tau - 0.05, \tau)}, that is in \verb{[0.90, 0.95)} with the default
+threshold: there, moving the threshold by a little moves those cells from
+"inflate the deaths" to "leave them alone". The returned values do not
+change because of the warning. Applied draw by draw, the rule also pulls
+the mean of the draws towards 1.
 }
 
 \examples{
-ddl_cap(c(0.62, 0.949, 0.95, 1.08, NA))
+# 0.949 is left alone and 0.95 becomes 1: the rule is a jump of 5.3\% in
+# the deaths that the next step estimates
+suppressWarnings(ddl_cap(c(0.62, 0.949, 0.95, 1.08, NA)))
 
 }
 \references{

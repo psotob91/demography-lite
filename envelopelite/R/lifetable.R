@@ -47,7 +47,7 @@
 #' Modeling Population Processes*. Oxford: Blackwell.
 #'
 #' @examples
-#' ages <- age_groups("single")
+#' ages <- evl_age_groups("single")
 #' mx <- 0.0003 + 0.00003 * exp(0.095 * ages$age_start)
 #' # Skeleton: valid inputs reach the "not implemented" condition.
 #' tryCatch(
@@ -189,7 +189,7 @@ evl_aggregate <- function(lifetables, population, by) {
 #'   the layout of [evl_lifetable()]: at least `age_start`, `age_end`, `lx`
 #'   and `nLx`.
 #' @param groups Data frame or data.table with the target age groups
-#'   (`age_start`, `age_end`), `age_groups("abridged")` by default.
+#'   (`age_start`, `age_end`), `evl_age_groups("abridged")` by default.
 #'
 #' @return When implemented, a data.table with one row per target age group,
 #'   in the layout of [evl_lifetable()].
@@ -215,7 +215,7 @@ evl_aggregate <- function(lifetables, population, by) {
 #'
 #' @family life table
 #' @export
-evl_abridge <- function(lifetable, groups = age_groups("abridged")) {
+evl_abridge <- function(lifetable, groups = evl_age_groups("abridged")) {
   .check_table(lifetable, "lifetable",
                cols = c("age_start", "age_end", "lx", "nLx"))
   .check_table(groups, "groups", cols = c("age_start", "age_end"))

@@ -35,7 +35,7 @@
 #' \doi{10.1137/0904045}
 #'
 #' @examples
-#' groups <- age_groups("five_year")
+#' groups <- prl_age_groups("five_year")
 #' pop <- rev(seq(100, 2000, length.out = nrow(groups)))
 #' # Skeleton: valid inputs reach the "not implemented" condition.
 #' tryCatch(
@@ -132,7 +132,7 @@ prl_rogers_castro <- function(age, params) {
 #' RR-81-30. Laxenburg: International Institute for Applied Systems Analysis.
 #'
 #' @examples
-#' groups <- age_groups("five_year")
+#' groups <- prl_age_groups("five_year")
 #' share <- rep(1 / nrow(groups), nrow(groups))
 #' # Skeleton: valid inputs reach the "not implemented" condition.
 #' tryCatch(

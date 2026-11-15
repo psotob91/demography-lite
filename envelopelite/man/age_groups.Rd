@@ -37,6 +37,10 @@ Returns a table of age groups in which every group is identified by its
 exact start and end in years. Across the family, age is always matched on
 \code{age_start} and \code{age_end}, never on a label.
 }
+\details{
+Shared infrastructure, not exported: every package of the family exports a
+thin wrapper of it under its own prefix, \verb{<prefix>_age_groups()}.
+}
 \section{GBD equivalent}{
 
 \strong{Replicates} the age groups under 5 years of the GBD 2023 demographics
@@ -54,15 +58,15 @@ No estimation is involved. Groups are contiguous, do not overlap, start at
 age 0 and end with one open group.
 }
 
-\examples{
-head(age_groups("gbd_u5"), 8)
-age_groups("five_year", open_age = 85)
-
-}
 \references{
 GBD 2023 Demographics Collaborators (2025). Global age-sex-specific
 all-cause mortality and life expectancy estimates for 204 countries and
 territories. \emph{The Lancet}, 406, 1731-1810.
 \doi{10.1016/S0140-6736(25)01330-3}
 }
+\seealso{
+Other age groups:
+\code{\link[=evl_age_groups]{evl_age_groups()}}
+}
 \concept{age groups}
+\keyword{internal}

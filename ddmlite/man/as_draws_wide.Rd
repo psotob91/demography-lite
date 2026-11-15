@@ -19,6 +19,10 @@ Returns one row per cell and one column per draw, with the column names
 used by the Global Burden of Disease (GBD) study: \code{draw_0}, ...,
 \verb{draw_\{K-1\}}.
 }
+\details{
+Shared infrastructure, not exported: every package of the family exports a
+thin wrapper of it under its own prefix, \verb{<prefix>_draws_wide()}.
+}
 \section{GBD equivalent}{
 
 \strong{Replicates} the wide exchange layout of the GBD study (zero-based draw
@@ -30,19 +34,19 @@ columns). Only the layout is replicated; no GBD code or data is used.
 No estimation is involved; the matrix is bound to the table of cells.
 }
 
-\examples{
-index <- data.frame(location_id = c(1, 2), sex_id = c(1, 1))
-x <- draws_new(index, matrix(1:6 / 10, nrow = 2), measure = "completeness")
-as_draws_wide(x)
-
-}
 \seealso{
 Other draws:
 \code{\link[=as_draws_long]{as_draws_long()}},
 \code{\link[=cell_seed]{cell_seed()}},
+\code{\link[=ddl_draws_generate]{ddl_draws_generate()}},
+\code{\link[=ddl_draws_long]{ddl_draws_long()}},
+\code{\link[=ddl_draws_new]{ddl_draws_new()}},
+\code{\link[=ddl_draws_wide]{ddl_draws_wide()}},
+\code{\link[=ddl_summarise]{ddl_summarise()}},
 \code{\link[=draws_generate]{draws_generate()}},
 \code{\link[=draws_new]{draws_new()}},
 \code{\link[=draws_summarise]{draws_summarise()}},
 \code{\link[=with_cell_seed]{with_cell_seed()}}
 }
 \concept{draws}
+\keyword{internal}
